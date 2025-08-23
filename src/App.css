@@ -48,8 +48,8 @@ body {
   margin: 0 0 6px;
 }
 
-.hero .subtitle {
-  margin: 0;
+.subtitle {
+  margin: 6px;
   font-size: 15px;
   font-weight: 500;
   color: var(--muted);
@@ -70,6 +70,12 @@ body {
   text-align: center;
 }
 
+.login-card h2 {
+  margin: 0px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
 .connect-button {
   width: 100%;
   background: var(--gradient);
@@ -80,4 +86,44 @@ body {
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
+  margin: 12px;
+}
+
+.feature-card {
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 24px;
+  align-items: center;
+  justify-content: left;
+  display: flex;
+  flex-direction: row;
+}
+
+.feature-card h4 {
+  margin: 0px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  margin-right: 12px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+  border-radius: 12px;
+  background: #fff9eb;
+  color: #ffda7a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.description {
+  font-size: 12px;
+  margin: 0px;
+  color: var(--muted);
 }
