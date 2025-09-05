@@ -132,3 +132,127 @@ body {
   margin: 0px;
   color: var(--muted);
 }
+
+.activity-list-card {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.activity-header {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4c483f;
+  margin-bottom: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.activity-list-card {
+  max-width: 700px;
+  min-width: 320px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 0; 
+}
+
+.activity-list-card ul {
+  list-style: none;   /* remove dots */
+  padding: 0;         /* remove default padding */
+  margin: 0;          /* remove default margin */
+}
+
+.activity-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.activity-icons {
+  display: flex;
+  gap: 4px;
+}
+
+.activity-icon {
+  width: 24px;
+  height: 24px;
+  background: #fff9eb;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f7c01e;
+}
+
+.activity-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #0f172a;
+}
+
+.activity-pace {
+  font-size: 14px;
+  color: #f7c01e;
+  font-weight: 500;
+}
+
+.activity-details {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #5b6477;
+}
+
+.activity-date,
+.activity-distance,
+.activity-duration {
+  display: flex;
+  gap: 4px;
+}
+
+.activity-feedback {
+  font-size: 12px;
+  color: #5b6477;
+  font-style: italic;
+}
+
+.activity-metrics {
+  font-size: 12px;
+  color: #5b6477;
+}
+
+.activity-comment {
+  margin-right: 8px;
+}
+
+.activity-box {
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  margin-bottom: 0;
+  padding: 20px 24px;
+  transition: box-shadow 0.2s;
+}
+
+.activity-box:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+@media (min-width: 900px) {
+  .activity-list-card {
+    max-width: 900px;
+    min-width: 700px;   /* Ensures it's wide on desktop */
+    width: 100%;
+    padding: 0 32px;
+  }
+}
+
+.activity-center-wrapper {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

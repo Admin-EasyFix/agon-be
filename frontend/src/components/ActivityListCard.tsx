@@ -8,32 +8,49 @@ interface ActivityListCardProps {
 
 export const ActivityListCard: React.FC<ActivityListCardProps> = ({ activities }) => (
   <div className="activity-list-card">
+    <div className="activity-header">Activities ({activities.length})</div>
     {activities.length === 0 ? (
       <div className="text-center text-muted-foreground py-8">
         No activities found.
       </div>
     ) : (
       <ul className="space-y-4">
-        {activities.map((activity) => (
-          <li key={activity.id}>
-            <Card className="p-4">
-              <h3 className="font-semibold text-lg mb-1">{activity.name}</h3>
-              <div className="text-sm text-muted-foreground mb-2">
-                {activity.type} &middot; {new Date(activity.date).toLocaleDateString()}
-              </div>
-              <div className="flex flex-wrap gap-4 text-sm">
-                <span>Distance: {activity.distance} km</span>
-                <span>Pace: {activity.pace}</span>
-                <span>Duration: {activity.duration} min</span>
-                {activity.elevation !== undefined && <span>Elevation: {activity.elevation} m</span>}
-                {activity.heartRate !== undefined && <span>Heart Rate: {activity.heartRate} bpm</span>}
-              </div>
-              <div className="mt-2 italic text-xs text-muted-foreground">
-                {activity.aiComment}
-              </div>
-            </Card>
-          </li>
-        ))}
+        {activities.map((activity) => {
+          const date = new Date(activity.date);
+          const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+          const [minutes, seconds] = activity.pace.split(':').map(Number);
+          const totalSeconds = minutes * 60 + seconds;
+          const pacePerKm = `${Math.floor(totalSeconds / 60)}:${(totalSeconds % 60).toString().padStart(2, '0')}/km`;
+
+          return (
+            <li key={activity.id}>
+              <Card className="p-4 activity-box">
+                <div className="activity-header-row">
+                  <div className="activity-icons">
+                    <span className="activity-icon">🏃</span>
+                    <span className="activity-icon">⏱️</span>
+                  </div>
+                  <h3 className="activity-title">
+                    {activity.name}
+                  </h3>
+                  <div className="activity-pace">{pacePerKm}</div>
+                </div>
+                <div className="activity-details">
+                  <span className="activity-date">{formattedDate}</span>
+                  <span className="activity-distance"> {activity.distance} km</span>
+                  <span className="activity-duration"> {activity.duration.toString().padStart(2, '0')}:${(activity.duration % 60).toString().padStart(2, '0')}</span>
+                </div>
+                <div className="activity-feedback">
+                  <span className="activity-comment">{activity.aiComment}</span>
+                </div>
+                <div className="activity-metrics">
+                  {activity.elevation !== undefined && <span> {activity.elevation}m elevation</span>}
+                  {activity.heartRate !== undefined && <span> ~{activity.heartRate} bpm avg</span>}
+                </div>
+              </Card>
+            </li>
+          );
+        })}
       </ul>
     )}
   </div>

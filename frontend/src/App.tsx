@@ -9,27 +9,39 @@ import { ActivityListCard } from "./components/ActivityListCard";
 const fakeActivities: Activity[] = [
   {
     id: "1",
-    date: "2025-08-31T09:00:00Z",
-    distance: 5.2,
-    pace: "5:10/km",
-    duration: 27,
-    aiComment: "Great run! Keep it up.",
-    elevation: 50,
-    heartRate: 140,
-    name: "Morning Run",
+    date: "2025-07-23T18:00:00Z",
+    distance: 4.7,
+    pace: "6:15",
+    duration: 29,
+    aiComment: "Great effort! Keep up the consistent training.",
+    elevation: 23,
+    heartRate: 137,
+    name: "Night Run",
     type: "running",
   },
   {
     id: "2",
-    date: "2025-08-30T18:00:00Z",
-    distance: 20,
-    pace: "3:00/km",
+    date: "2025-07-20T18:00:00Z",
+    distance: 6.2,
+    pace: "9:55",
     duration: 60,
-    aiComment: "Strong cycling session.",
-    elevation: 200,
-    heartRate: 130,
-    name: "Evening Ride",
-    type: "cycling",
+    aiComment: "Great effort! Keep up the consistent training.",
+    elevation: 13,
+    heartRate: 99,
+    name: "Night Run",
+    type: "running",
+  },
+  {
+    id: "3",
+    date: "2025-07-19T06:00:00Z",
+    distance: 6.0,
+    pace: "4:05",
+    duration: 30,
+    aiComment: "Great effort! Keep up the consistent training.",
+    elevation: undefined,
+    heartRate: 183,
+    name: "Morning Run",
+    type: "running",
   },
 ];
 
@@ -50,7 +62,9 @@ function App() {
           </button>
         </div>
       ) : (
-        <ActivityListCard activities={fakeActivities} />
+        <div className="activity-center-wrapper">
+          <ActivityListCard activities={fakeActivities} />
+        </div>
       )}
       <Footer />
     </main>
