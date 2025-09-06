@@ -1,0 +1,40 @@
+import type { Activity } from "../types/Activity";
+
+export const fakeActivities: Activity[] = [
+  {
+    id: "1",
+    date: "2025-07-23T18:00:00Z",
+    distance: 4.7,
+    pace: "6:15",
+    duration: 29,
+    aiComment: "Great effort! Keep up the consistent training.",
+    elevation: 23,
+    heartRate: 137,
+    name: "Night Run",
+    type: "running",
+  },
+  {
+    id: "2",
+    date: "2025-07-20T18:00:00Z",
+    distance: 6.2,
+    pace: "9:55",
+    duration: 60,
+    aiComment: "Great effort! Keep up the consistent training.",
+    elevation: 13,
+    heartRate: 99,
+    name: "Night Run",
+    type: "running",
+  },
+  {
+    id: "3",
+    date: "2025-07-19T06:00:00Z",
+    distance: 6.0,
+    pace: "4:05",
+    duration: 30,
+    aiComment: "Great effort! Keep up the consistent training.",
+    elevation: undefined,
+    heartRate: 183,
+    name: "Morning Run",
+    type: "running",
+  },
+];
