@@ -38,7 +38,7 @@ export const ActivityListCard: React.FC<ActivityListCardProps> = ({ activities }
                 <div className="activity-details">
                   <span className="activity-date">{formattedDate}</span>
                   <span className="activity-distance"> {activity.distance} km</span>
-                  <span className="activity-duration"> {activity.duration.toString().padStart(2, '0')}:${(activity.duration % 60).toString().padStart(2, '0')}</span>
+                  <span className="activity-duration"> {activity.duration} min</span>
                 </div>
                 <div className="activity-feedback">
                   <span className="activity-comment">{activity.aiComment}</span>
