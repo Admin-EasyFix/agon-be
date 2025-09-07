@@ -5,11 +5,14 @@ import App from "./App";
 import { v4 as uuidv4 } from "uuid";
 import "./App.css";
 
+const clientId = import.meta.env.VITE_STRAVA_CLIENT_ID;
+const secret = import.meta.env.VITE_STRAVA_CLIENT_SECRET;
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AuthProvider
       authConfig={{
-        clientId: import.meta.env.VITE_STRAVA_CLIENT_ID!,
+        clientId: clientId,
         authorizationEndpoint: "https://www.strava.com/oauth/authorize",
         tokenEndpoint: "https://www.strava.com/oauth/token",
         redirectUri: window.location.origin,
@@ -18,7 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         state: uuidv4(),
         responseType: "code",
         extraTokenParameters: {
-          client_secret: import.meta.env.VITE_STRAVA_CLIENT_SECRET!,
+          client_secret: secret,
           approval_prompt: "auto"
         },
         onAccessTokenExpiry: (refresh) => refresh(),

@@ -32,7 +32,7 @@ declare module "react-oauth2-code-pkce" {
 export interface AuthContextType {
   token: string | null;                     // Access token (null if not logged in)
   idToken: string | null;                   // Optional OpenID token
-  tokenData: Record<string, any> | null;    // Decoded JWT payload (from access or id token)
+  tokenData: Record<string, unknown> | null;    // Decoded JWT payload (from access or id token)
   logIn: (extraParams?: Record<string, string>, state?: string, display?: "page" | "popup") => void;
   logOut: () => void;                       // Clears tokens & login state
   error: string | null;                     // Any error during login/refresh
