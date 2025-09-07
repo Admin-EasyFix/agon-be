@@ -10,3 +10,11 @@ export interface Activity {
     name: string;
     type: 'running' | 'cycling' | 'swimming' | 'hiking' | 'other';
 }
+
+export interface Athlete {
+  id: number;
+  username: string;
+  firstname: string;
+  lastname: string;
+  profile: string;
+}
