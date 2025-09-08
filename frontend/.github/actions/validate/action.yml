@@ -7,7 +7,7 @@ description: |
   - runs type checks
   - runs tests
   - validates version
-  
+
 runs:
   using: "composite"
   steps:
@@ -15,6 +15,10 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: '20.x'
+
+    - name: Change working directory
+      run: cd frontend
+      shell: bash
       
     - name: Install dependencies
       uses: Admin-EasyFix/github-actions/actions/npm/install@main
@@ -29,4 +33,4 @@ runs:
       uses: Admin-EasyFix/github-actions/actions/npm/run-tests@main
 
     - name: Ensure version is updated
-      uses: Admin-EasyFix/github-actions/actions/npm/validate-pr-version@main
+      uses: Admin-EasyFix/github-actions/actions/npm/validate-version@main
