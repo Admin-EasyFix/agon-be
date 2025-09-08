@@ -33,4 +33,4 @@ runs:
       uses: Admin-EasyFix/github-actions/actions/npm/run-tests@main
 
     - name: Ensure version is updated
-      uses: Admin-EasyFix/github-actions/actions/npm/validate-version@main
+      uses: Admin-EasyFix/github-actions/actions/npm/validate-pr-version@main
