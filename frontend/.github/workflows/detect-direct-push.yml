@@ -1,0 +1,15 @@
+name: Detect Direct Push to Main
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  detect-direct-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Detect direct push
+        uses: Admin-EasyFix/github-actions/actions/version-control/detect-direct-push@main

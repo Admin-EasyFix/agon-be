@@ -1,0 +1,21 @@
+name: CI
+
+description: |
+  This workflow runs the CI action on pushes and pull requests to the main branch.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Validate application
+      uses: ./.github/actions/validate
