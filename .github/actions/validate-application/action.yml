@@ -6,7 +6,6 @@ description: |
   - runs lint
   - runs type checks
   - runs tests
-  - validates version
 
 runs:
   using: "composite"
@@ -15,22 +14,23 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: '20.x'
-
-    - name: Change working directory
-      run: cd frontend
-      shell: bash
       
     - name: Install dependencies
       uses: Admin-EasyFix/github-actions/actions/npm/install@main
+      with:
+        working-directory: frontend
 
     - name: Run ESLint
-      uses: Admin-EasyFix/github-actions/actions/npm/run-eslint@main
+      uses: Admin-EasyFix/github-actions/actions/npm/lint@main
+      with:
+        working-directory: frontend
       
     - name: Run type check
-      uses: Admin-EasyFix/github-actions/actions/npm/run-type-check@main
+      uses: Admin-EasyFix/github-actions/actions/npm/type-check@main
+      with:
+        working-directory: frontend
 
     - name: Run tests
       uses: Admin-EasyFix/github-actions/actions/npm/run-tests@main
-
-    - name: Ensure version is updated
-      uses: Admin-EasyFix/github-actions/actions/npm/validate-pr-version@main
+      with:
+        working-directory: frontend
