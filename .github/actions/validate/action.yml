@@ -24,10 +24,10 @@ runs:
       uses: Admin-EasyFix/github-actions/actions/npm/install@main
 
     - name: Run ESLint
-      uses: Admin-EasyFix/github-actions/actions/npm/run-eslint@main
+      uses: Admin-EasyFix/github-actions/actions/npm/lint@main
       
     - name: Run type check
-      uses: Admin-EasyFix/github-actions/actions/npm/run-type-check@main
+      uses: Admin-EasyFix/github-actions/actions/npm/type-check@main
 
     - name: Run tests
       uses: Admin-EasyFix/github-actions/actions/npm/run-tests@main
