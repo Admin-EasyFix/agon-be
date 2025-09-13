@@ -18,7 +18,6 @@ runs:
       
     - name: Install dependencies
       uses: Admin-EasyFix/github-actions/actions/npm/install@main
-      shell: bash
       with:
         working-directory: frontend
 
