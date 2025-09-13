@@ -17,22 +17,27 @@ runs:
         node-version: '20.x'
       
     - name: Install dependencies
-      run: npm ci
+      uses: Admin-EasyFix/github-actions/actions/npm/install@main
       shell: bash
-      working-directory: frontend
+      with:
+        working-directory: frontend
 
     - name: Run ESLint
       uses: Admin-EasyFix/github-actions/actions/npm/lint@main
-      working-directory: frontend
+      with:
+        working-directory: frontend
       
     - name: Run type check
       uses: Admin-EasyFix/github-actions/actions/npm/type-check@main
-      working-directory: frontend
+      with:
+        working-directory: frontend
 
     - name: Run tests
       uses: Admin-EasyFix/github-actions/actions/npm/run-tests@main
-      working-directory: frontend
+      with:
+        working-directory: frontend
 
     - name: Ensure version is updated
       uses: Admin-EasyFix/github-actions/actions/npm/validate-pr-version@main
-      working-directory: frontend
+      with:
+        working-directory: frontend
