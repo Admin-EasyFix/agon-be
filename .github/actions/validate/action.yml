@@ -18,15 +18,20 @@ runs:
       
     - name: Install dependencies
       uses: Admin-EasyFix/github-actions/actions/npm/install@main
+      working-directory: frontend
 
     - name: Run ESLint
       uses: Admin-EasyFix/github-actions/actions/npm/lint@main
+      working-directory: frontend
       
     - name: Run type check
       uses: Admin-EasyFix/github-actions/actions/npm/type-check@main
+      working-directory: frontend
 
     - name: Run tests
       uses: Admin-EasyFix/github-actions/actions/npm/run-tests@main
+      working-directory: frontend
 
     - name: Ensure version is updated
       uses: Admin-EasyFix/github-actions/actions/npm/validate-pr-version@main
+      working-directory: frontend
