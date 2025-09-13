@@ -1,0 +1,11 @@
+name: Validate version
+
+description: Validates that the version in package.json has been updated in the pull request.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Ensure version is updated
+      uses: Admin-EasyFix/github-actions/actions/npm/validate-pr-version@main
+      with:
+        working-directory: frontend

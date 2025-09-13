@@ -1,11 +1,8 @@
-name: CI
+name: Validate pull request version
 
-description: |
-  This workflow runs the CI action on pushes and pull requests to the main branch.
+description: This workflow validates that the version in package.json has been updated in the pull request.
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -18,4 +15,4 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Validate application
-      uses: ./.github/actions/validate-application
+      uses: ./.github/actions/validate-version
