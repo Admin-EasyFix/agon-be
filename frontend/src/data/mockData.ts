@@ -1,4 +1,4 @@
-import type { Activity } from "../types/Activity";
+import type { Activity } from "../types/strava";
 
 export const fakeActivities: Activity[] = [
   {

@@ -1,5 +1,5 @@
 import React from "react";
-import type { Activity } from "../types/Activity";
+import type { Activity } from "../types/strava";
 import { Card } from "./ui/card";
 
 interface ActivityListCardProps {
