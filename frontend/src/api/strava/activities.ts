@@ -1,6 +1,6 @@
 import { stravaFetch } from "./client";
-import { type Activity } from "../../types/strava";
+import { type StravaActivity } from "../../types/strava-api";
 
 export async function getActivities(accessToken: string, perPage = 30, page = 1) {
-  return stravaFetch<Activity[]>(`/athlete/activities?per_page=${perPage}&page=${page}`, accessToken);
+  return stravaFetch<StravaActivity[]>(`/athlete/activities?per_page=${perPage}&page=${page}`, accessToken);
 }

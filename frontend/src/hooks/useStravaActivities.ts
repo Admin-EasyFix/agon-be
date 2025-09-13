@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getActivities } from '../api/strava';
 import type { Activity } from '../types/strava';
+import type { StravaActivity } from '../types/strava-api';
 
 interface UseStravaActivitiesResult {
   activities: Activity[];
@@ -36,7 +37,7 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
     return typeMap[stravaType] || 'other';
   };
 
-  const generateAIComment = (activity: any): string => {
+  const generateAIComment = (activity: StravaActivity): string => {
     const distanceKm = activity.distance ? activity.distance / 1000 : 0;
     const durationMinutes = activity.moving_time ? activity.moving_time / 60 : 0;
     
@@ -71,13 +72,13 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
       const stravaActivities = await getActivities(token, 30, 1);
       
       // Transform Strava activities to our Activity interface
-      const transformedActivities: Activity[] = stravaActivities.map((stravaActivity: any) => ({
+      const transformedActivities: Activity[] = stravaActivities.map((stravaActivity: StravaActivity) => ({
         id: stravaActivity.id.toString(),
         name: stravaActivity.name,
         date: stravaActivity.start_date,
         distance: stravaActivity.distance ? Math.round((stravaActivity.distance / 1000) * 10) / 10 : 0, // Convert meters to km
-        pace: calculatePace(stravaActivity.distance, stravaActivity.moving_time),
-        duration: Math.round(stravaActivity.moving_time / 60), // Convert seconds to minutes
+        pace: calculatePace(stravaActivity.distance || 0, stravaActivity.moving_time || 0),
+        duration: Math.round((stravaActivity.moving_time || 0) / 60), // Convert seconds to minutes
         aiComment: generateAIComment(stravaActivity),
         elevation: stravaActivity.total_elevation_gain,
         heartRate: stravaActivity.average_heartrate,
