@@ -1,11 +1,12 @@
 name: PR Agent (Gemini)
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review]
-  issue_comment:
+    types: [opened, synchronize, reopened, ready_for_review]  # Added 'synchronize' for updates
+  issue_comment:  # For manual commands like /review
+    types: [created]
 jobs:
   pr_agent_job:
-    if: ${{ github.event.sender.type != 'Bot' }}
+    if: ${{ github.event.sender.type != 'Bot' }}  # Skip bot-triggered events
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -13,12 +14,16 @@ jobs:
       contents: write
     steps:
       - name: PR Agent action step
-        uses: qodo-ai/pr-agent@main
+        uses: Codium-ai/pr-agent@main  # Official action name (not qodo-ai)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          config.model: "gemini/gemini-1.5-flash"
-          config.fallback_models: '["gemini/gemini-1.5-flash"]'
-          GOOGLE_AI_STUDIO.GEMINI_API_KEY: ${{ secrets.GOOGLE_AI_STUDIO_GEMINI_API_KEY }}
-          github_action_config.auto_review: "true"
-          github_action_config.auto_describe: "true"
-          github_action_config.auto_improve: "true"
+          GEMINI_API_KEY: ${{ secrets.GOOGLE_AI_STUDIO_GEMINI_API_KEY }}  # For Gemini via LiteLLM
+          # Model config (use LiteLLM format for Gemini)
+          OPENAI_API_BASE: "https://api.google.com/v1"  # Proxy base for Gemini
+          OPENAI_API_KEY: ${{ secrets.GOOGLE_AI_STUDIO_GEMINI_API_KEY}}  # Map to OpenAI-compatible
+          # Auto-run settings (as env vars; these override defaults)
+          GITHUB_ACTION_CONFIG_AUTO_REVIEW: "true"
+          GITHUB_ACTION_CONFIG_AUTO_DESCRIBE: "true"
+          GITHUB_ACTION_CONFIG_AUTO_IMPROVE: "true"
+          # Debug logging
+          LOG_LEVEL: "DEBUG"  # Add for verbose output in logs
