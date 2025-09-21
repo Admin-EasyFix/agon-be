@@ -1,9 +1,9 @@
 name: PR Agent (Gemini)
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]  # Added 'synchronize' to run on PR updates
+    types: [opened, synchronize, reopened, ready_for_review]
   issue_comment:
-    types: [created]  # For manual commands like /review
+    types: [created]
 jobs:
   pr_agent_job:
     if: ${{ github.event.sender.type != 'Bot' }}
@@ -14,13 +14,15 @@ jobs:
       contents: write
     steps:
       - name: PR Agent action step
-        uses: qodo-ai/pr-agent@main  # Updated to official Qodo repo
+        uses: qodo-ai/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GOOGLE_AI_STUDIO_GEMINI_API_KEY }}  # Direct Gemini var (no OpenAI mapping)
-          config.model: "gemini/gemini-1.5-flash"  # Or "gemini/gemini-2.0-flash" if available
-          config.fallback_models: '["gemini/gemini-1.5-flash"]'
+          GEMINI_API_KEY: ${{ secrets.GOOGLE_AI_STUDIO_GEMINI_API_KEY }}
+          PROVIDER: "gemini"  # Explicitly set Gemini provider
+          MODEL: "gemini-1.5-flash"  # Correct model name for LiteLLM
+          FALLBACK_MODELS: '["gemini-1.5-pro"]'  # Fallback model
+          github_action_config.run_on_synchronize: "true"  # Enable auto-actions on synchronize
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "true"
           github_action_config.auto_improve: "true"
-          LOG_LEVEL: "DEBUG"  # Keep for troubleshooting
+          LOG_LEVEL: "DEBUG"  # Keep for detailed logs
