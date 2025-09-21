@@ -1,12 +1,12 @@
 name: PR Agent (Gemini)
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]  # Added 'synchronize' for updates
-  issue_comment:  # For manual commands like /review
-    types: [created]
+    types: [opened, synchronize, reopened, ready_for_review]  # Added 'synchronize' to run on PR updates
+  issue_comment:
+    types: [created]  # For manual commands like /review
 jobs:
   pr_agent_job:
-    if: ${{ github.event.sender.type != 'Bot' }}  # Skip bot-triggered events
+    if: ${{ github.event.sender.type != 'Bot' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -14,16 +14,13 @@ jobs:
       contents: write
     steps:
       - name: PR Agent action step
-        uses: Codium-ai/pr-agent@main  # Official action name (not qodo-ai)
+        uses: qodo-ai/pr-agent@main  # Updated to official Qodo repo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GEMINI_API_KEY: ${{ secrets.GOOGLE_AI_STUDIO_GEMINI_API_KEY }}  # For Gemini via LiteLLM
-          # Model config (use LiteLLM format for Gemini)
-          OPENAI_API_BASE: "https://api.google.com/v1"  # Proxy base for Gemini
-          OPENAI_API_KEY: ${{ secrets.GOOGLE_AI_STUDIO_GEMINI_API_KEY}}  # Map to OpenAI-compatible
-          # Auto-run settings (as env vars; these override defaults)
-          GITHUB_ACTION_CONFIG_AUTO_REVIEW: "true"
-          GITHUB_ACTION_CONFIG_AUTO_DESCRIBE: "true"
-          GITHUB_ACTION_CONFIG_AUTO_IMPROVE: "true"
-          # Debug logging
-          LOG_LEVEL: "DEBUG"  # Add for verbose output in logs
+          GEMINI_API_KEY: ${{ secrets.GOOGLE_AI_STUDIO_GEMINI_API_KEY }}  # Direct Gemini var (no OpenAI mapping)
+          config.model: "gemini/gemini-1.5-flash"  # Or "gemini/gemini-2.0-flash" if available
+          config.fallback_models: '["gemini/gemini-1.5-flash"]'
+          github_action_config.auto_review: "true"
+          github_action_config.auto_describe: "true"
+          github_action_config.auto_improve: "true"
+          LOG_LEVEL: "DEBUG"  # Keep for troubleshooting
