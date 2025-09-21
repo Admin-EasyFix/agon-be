@@ -22,4 +22,3 @@ jobs:
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "true"
           github_action_config.auto_improve: "true"
-          LOG_LEVEL: "DEBUG"
