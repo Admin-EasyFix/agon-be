@@ -6,7 +6,7 @@ runs:
   using: "composite"
   steps:
     - name: Auto bump version
-      uses: Admin-EasyFix/github-actions/actions/npm/auto-bump-pr-version@main
+      uses: Admin-EasyFix/github-actions/actions/npm/bump-pr-version@main
       with:
         working-directory: frontend
 
