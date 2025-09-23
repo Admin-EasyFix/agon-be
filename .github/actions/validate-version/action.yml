@@ -5,6 +5,11 @@ description: Validates that the version in package.json has been updated in the 
 runs:
   using: "composite"
   steps:
+    - name: Auto bump version
+      uses: Admin-EasyFix/github-actions/actions/npm/bump-pr-version@main
+      with:
+        working-directory: frontend
+
     - name: Ensure version is updated
       uses: Admin-EasyFix/github-actions/actions/npm/validate-pr-version@main
       with:
