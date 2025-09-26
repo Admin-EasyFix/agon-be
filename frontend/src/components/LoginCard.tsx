@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
+import "../styles/auth.css";
 
 function LoginCard() {
   const { logIn } = useContext(AuthContext);

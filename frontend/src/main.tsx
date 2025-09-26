@@ -5,11 +5,6 @@ import App from "./App";
 import { v4 as uuidv4 } from "uuid";
 import "./styles/global.css";
 import "./styles/layout.css";
-import "./styles/hero.css";
-import "./styles/auth.css";
-import "./styles/feature.css";
-import "./styles/activity.css";
-import "./styles/ai-recommendation.css";
 import "./styles/utilities.css";
 
 const clientId = import.meta.env.VITE_STRAVA_CLIENT_ID;

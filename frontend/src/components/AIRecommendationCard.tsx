@@ -1,6 +1,7 @@
 import React from "react";
 import type { Activity } from "../types/strava";
 import { Card } from "./ui/card";
+import "../styles/ai-recommendation.css";
 
 interface AIRecommendationCardProps {
   activities: Activity[];
