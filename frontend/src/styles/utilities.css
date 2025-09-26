@@ -1,0 +1,73 @@
+/* utilities.css */
+.text-center {
+  text-align: center;
+}
+
+.text-red-500 {
+  color: #dc2626;
+}
+
+.text-muted-foreground {
+  color: var(--muted);
+}
+
+.text-lg {
+  font-size: 18px;
+}
+
+.text-sm {
+  font-size: 14px;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.hover\:text-red-500:hover {
+  color: #dc2626;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}

@@ -3,7 +3,9 @@ import ReactDOM from "react-dom/client";
 import { AuthProvider } from "react-oauth2-code-pkce";
 import App from "./App";
 import { v4 as uuidv4 } from "uuid";
-import "./App.css";
+import "./styles/global.css";
+import "./styles/layout.css";
+import "./styles/utilities.css";
 
 const clientId = import.meta.env.VITE_STRAVA_CLIENT_ID;
 const secret = import.meta.env.VITE_STRAVA_CLIENT_SECRET;

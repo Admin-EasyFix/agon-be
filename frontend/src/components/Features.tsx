@@ -1,4 +1,5 @@
 import { Zap } from 'lucide-react';
+import "../styles/feature.css";
 
 function Features() {
   return (

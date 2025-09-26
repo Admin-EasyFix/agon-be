@@ -1,0 +1,14 @@
+:root {
+  --bg: #f6f7fb;
+  --text: #0f172a;
+  --muted: #5b6477;
+  --gradient: linear-gradient(135deg, #f7c01e 0%, #4c483f 100%);}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,38 @@
+/* feature.css */
+.feature-card {
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  margin-right: 12px;
+  border-radius: 12px;
+  background: #fff9eb;
+  color: #ffda7a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-card h4,
+.description {
+  flex: 1;
+  margin: 0;
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+  .feature-card {
+    padding: 12px;
+  }
+}
