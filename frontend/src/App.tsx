@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import LoginCard from "./components/LoginCard";
 import { ActivityListCard } from "./components/ActivityListCard";
+import { AIRecommendationCard } from "./components/AIRecommendationCard";
 import { useStravaActivities } from "./hooks/useStravaActivities";
 
 function App() {
@@ -14,47 +15,48 @@ function App() {
   const isAuthenticated = !!token;
 
   return (
-    <main className="container">
-      <Hero />
-      {!isAuthenticated ? (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <Features />
-          <LoginCard />
-          {error && (
-            <div className="text-red-500 text-sm mt-4">
-              Authentication error: {error}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="activity-center-wrapper">
-          {loading ? (
-            <div className="text-center">
-              <div className="text-lg font-medium mb-2">Loading activities...</div>
-              <div className="text-muted-foreground">Fetching your latest workouts from Strava</div>
-            </div>
-          ) : apiError ? (
-            <div className="text-center">
-              <div className="text-red-500 text-lg font-medium mb-2">Error loading activities</div>
-              <div className="text-muted-foreground mb-4">{apiError}</div>
-              <button 
-                className="connect-button" 
-                onClick={refetch}
-                style={{maxWidth: '200px'}}
-              >
-                Retry
-              </button>
-              <button 
-                className="connect-button" 
-                onClick={logOut}
-                style={{maxWidth: '200px', marginTop: '8px', background: '#dc2626'}}
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="text-right mb-4">
+    <main>
+      <div className="container">
+        <Hero />
+        {!isAuthenticated ? (
+          <div className="flex flex-col items-center justify-center min-h-screen">
+            <Features />
+            <LoginCard />
+            {error && (
+              <div className="text-red-500 text-sm mt-4">
+                Authentication error: {error}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="activity-center-wrapper">
+            {loading ? (
+              <div className="text-center">
+                <div className="text-lg font-medium mb-2">Loading activities...</div>
+                <div className="text-muted-foreground">Fetching your latest workouts from Strava</div>
+              </div>
+            ) : apiError ? (
+              <div className="text-center">
+                <div className="text-red-500 text-lg font-medium mb-2">Error loading activities</div>
+                <div className="text-muted-foreground mb-4">{apiError}</div>
+                <button 
+                  className="connect-button" 
+                  onClick={refetch}
+                  style={{maxWidth: '200px'}}
+                >
+                  Retry
+                </button>
+                <button 
+                  className="connect-button" 
+                  onClick={logOut}
+                  style={{maxWidth: '200px', marginTop: '8px', background: '#dc2626'}}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+            <div className="authenticated-content">
+              <div className="logout-container">
                 <button 
                   className="text-sm text-muted-foreground hover:text-red-500 cursor-pointer"
                   onClick={logOut}
@@ -62,12 +64,14 @@ function App() {
                   Logout
                 </button>
               </div>
-              <ActivityListCard activities={activities} />
-            </>
-          )}
-        </div>
-      )}
-      <Footer />
+                <AIRecommendationCard activities={activities} />
+                <ActivityListCard activities={activities} />
+              </div>
+            )}
+          </div>
+        )}
+        <Footer />
+      </div>
     </main>
   );
 }
