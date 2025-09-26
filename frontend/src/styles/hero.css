@@ -1,0 +1,36 @@
+/* hero.css */
+.hero {
+  text-align: center;
+  margin: 0 auto 28px;
+}
+
+.app-icon {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 12px;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.1));
+  border-radius: 24px;
+  background: var(--gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-icon img {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+}
+
+.hero h1 {
+  font-size: 30px;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+
+.subtitle {
+  margin: 6px 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+}
