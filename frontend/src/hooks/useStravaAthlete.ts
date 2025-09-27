@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import userIcon from '../assets/user.png';
 import { getAthlete } from "../api/strava";
 import type { Athlete } from "../types/strava";
@@ -15,7 +15,7 @@ export function useStravaAthlete(token: string | null): UseStravaAthleteResult {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAthlete = async () => {
+  const fetchAthlete = useCallback(async () => {
     if (!token) {
       setAthlete(null);
       return;
@@ -42,11 +42,11 @@ export function useStravaAthlete(token: string | null): UseStravaAthleteResult {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchAthlete();
-  }, [token]);
+  }, [fetchAthlete]);
 
   return {
     athlete,

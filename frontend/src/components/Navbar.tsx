@@ -13,6 +13,9 @@ function Navbar() {
   const toggleMenu = () => setOpen((prev) => !prev);
 
   useEffect(() => {
+    if (!open) {
+      return;
+    }
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpen(false);
@@ -23,7 +26,7 @@ function Navbar() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [open]);
 
   return (
     <div className="navbar">
@@ -41,7 +44,6 @@ function Navbar() {
             src={athlete?.profile || userIcon}
             alt="Profile"
             className="profile-pic"
-            style={{ cursor: apiError ? "pointer" : "default" }}
             onClick={apiError ? refetch : toggleMenu}
           />
         )}
