@@ -2,7 +2,8 @@
   --bg: #f6f7fb;
   --text: #0f172a;
   --muted: #5b6477;
-  --gradient: linear-gradient(135deg, #f7c01e 0%, #4c483f 100%);}
+  --gradient: linear-gradient(135deg, #f7c01e 0%, #4c483f 100%);
+}
 
 body {
   margin: 0;
