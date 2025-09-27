@@ -7,9 +7,10 @@ import LoginCard from "./components/LoginCard";
 import { ActivityListCard } from "./components/ActivityListCard";
 import { AIRecommendationCard } from "./components/AIRecommendationCard";
 import { useStravaActivities } from "./hooks/useStravaActivities";
+import Navbar from "./components/Navbar";
 
 function App() {
-  const { token, logOut, error } = useContext(AuthContext);
+  const { token, error } = useContext(AuthContext);
   const { activities, loading, error: apiError, refetch } = useStravaActivities(token);
 
   const isAuthenticated = !!token;
@@ -17,9 +18,9 @@ function App() {
   return (
     <main>
       <div className="container">
-        <Hero />
         {!isAuthenticated ? (
           <div className="flex flex-col items-center justify-center min-h-screen">
+            <Hero />
             <Features />
             <LoginCard />
             {error && (
@@ -29,45 +30,33 @@ function App() {
             )}
           </div>
         ) : (
-          <div className="activity-center-wrapper">
-            {loading ? (
-              <div className="text-center">
-                <div className="text-lg font-medium mb-2">Loading activities...</div>
-                <div className="text-muted-foreground">Fetching your latest workouts from Strava</div>
-              </div>
-            ) : apiError ? (
-              <div className="text-center">
-                <div className="text-red-500 text-lg font-medium mb-2">Error loading activities</div>
-                <div className="text-muted-foreground mb-4">{apiError}</div>
-                <button 
-                  className="connect-button" 
-                  onClick={refetch}
-                  style={{maxWidth: '200px'}}
-                >
-                  Retry
-                </button>
-                <button 
-                  className="connect-button" 
-                  onClick={logOut}
-                  style={{maxWidth: '200px', marginTop: '8px', background: '#dc2626'}}
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-            <div className="authenticated-content">
-              <div className="logout-container">
-                <button 
-                  className="text-sm text-muted-foreground hover:text-red-500 cursor-pointer"
-                  onClick={logOut}
-                >
-                  Logout
-                </button>
-              </div>
-                <AIRecommendationCard activities={activities} />
-                <ActivityListCard activities={activities} />
-              </div>
-            )}
+          <div>
+            <Navbar />
+            <div className="activity-center-wrapper">
+              {loading ? (
+                <div className="text-center">
+                  <div className="text-lg font-medium mb-2">Loading activities...</div>
+                  <div className="text-muted-foreground">Fetching your latest workouts from Strava</div>
+                </div>
+              ) : apiError ? (
+                <div className="text-center">
+                  <div className="text-red-500 text-lg font-medium mb-2">Error loading activities</div>
+                  <div className="text-muted-foreground mb-4">{apiError}</div>
+                  <button 
+                    className="connect-button" 
+                    onClick={refetch}
+                    style={{maxWidth: '200px'}}
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : (
+              <div className="authenticated-content">
+                  <AIRecommendationCard activities={activities} />
+                  <ActivityListCard activities={activities} />
+                </div>
+              )}
+            </div>
           </div>
         )}
         <Footer />

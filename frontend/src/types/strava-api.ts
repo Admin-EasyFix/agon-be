@@ -60,7 +60,7 @@ export interface StravaActivity {
   gear?: StravaGear;
   partner_brand_tag?: string;
   photos?: StravaPhotosSummary;
-  highlighted_kudosers?: StravaAthleteSummary[];
+  highlighted_kudosers?: StravaAthlete[];
   device_name?: string;
   embed_token?: string;
   segment_leaderboard_opt_out: boolean;
@@ -159,7 +159,7 @@ export interface StravaPhoto {
   source: number;
 }
 
-export interface StravaAthleteSummary {
+export interface StravaAthlete {
   id: number;
   username?: string;
   resource_state: number;
