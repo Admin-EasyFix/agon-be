@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { getActivities } from '../api/strava';
 import type { Activity } from '../types/strava';
 import type { StravaActivity } from '../types/strava-api';
+import { GeminiClient } from '../api/gemini/client';
+
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 interface UseStravaActivitiesResult {
   activities: Activity[];
@@ -37,26 +40,33 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
     return typeMap[stravaType] || 'other';
   };
 
-  const generateAIComment = (activity: StravaActivity): string => {
-    const distanceKm = activity.distance ? activity.distance / 1000 : 0;
-    const durationMinutes = activity.moving_time ? activity.moving_time / 60 : 0;
-    
-    if (distanceKm > 10) {
-      return "Impressive long distance workout! Your endurance is really building up.";
-    } else if (distanceKm > 5) {
-      return "Great mid-distance effort! Keep up the consistent training.";
-    } else if (durationMinutes > 60) {
-      return "Nice long training session! Time on feet is valuable.";
-    } else if (activity.average_heartrate && activity.average_heartrate > 150) {
-      return "High intensity workout! Great for building speed and power.";
-    } else {
-      const comments = [
-        "Solid training session. Every workout counts!",
-        "Good effort! Consistency is key to improvement.",
-        "Nice work! Building that base fitness."
-      ];
-      return comments[Math.floor(Math.random() * comments.length)];
+  const generateAIComment = async (activity: StravaActivity): Promise<string> => {
+    try {
+      const ai = new GeminiClient(apiKey);
+      return await ai.generateComment(activity);
+    } catch (error) {
+      console.error('Failed to generate AI comment:', error);
+      const distanceKm = activity.distance ? activity.distance / 1000 : 0;
+      const durationMinutes = activity.moving_time ? activity.moving_time / 60 : 0;
+      
+      if (distanceKm > 10) {
+        return "Impressive long distance workout! Your endurance is really building up.";
+      } else if (distanceKm > 5) {
+        return "Great mid-distance effort! Keep up the consistent training.";
+      } else if (durationMinutes > 60) {
+        return "Nice long training session! Time on feet is valuable.";
+      } else if (activity.average_heartrate && activity.average_heartrate > 150) {
+        return "High intensity workout! Great for building speed and power.";
+      } else {
+        const comments = [
+          "Solid training session. Every workout counts!",
+          "Good effort! Consistency is key to improvement.",
+          "Nice work! Building that base fitness."
+        ];
+        return comments[Math.floor(Math.random() * comments.length)];
+      }
     }
+    
   };
 
   const fetchActivities = async () => {
@@ -69,21 +79,23 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
     setError(null);
     
     try {
-      const stravaActivities = await getActivities(token, 30, 1);
+      const stravaActivities = await getActivities(token, 5, 1);
       
       // Transform Strava activities to our Activity interface
-      const transformedActivities: Activity[] = stravaActivities.map((stravaActivity: StravaActivity) => ({
-        id: stravaActivity.id.toString(),
-        name: stravaActivity.name,
-        date: stravaActivity.start_date,
-        distance: stravaActivity.distance ? Math.round((stravaActivity.distance / 1000) * 10) / 10 : 0, // Convert meters to km
-        pace: calculatePace(stravaActivity.distance || 0, stravaActivity.moving_time || 0),
-        duration: Math.round((stravaActivity.moving_time || 0) / 60), // Convert seconds to minutes
-        aiComment: generateAIComment(stravaActivity),
-        elevation: stravaActivity.total_elevation_gain,
-        heartRate: stravaActivity.average_heartrate,
-        type: mapActivityType(stravaActivity.type)
-      }));
+      const transformedActivities: Activity[] = await Promise.all(
+        stravaActivities.map(async (stravaActivity: StravaActivity) => ({
+          id: stravaActivity.id.toString(),
+          name: stravaActivity.name,
+          date: stravaActivity.start_date,
+          distance: stravaActivity.distance ? Math.round((stravaActivity.distance / 1000) * 10) / 10 : 0, // Convert meters to km
+          pace: calculatePace(stravaActivity.distance || 0, stravaActivity.moving_time || 0),
+          duration: Math.round((stravaActivity.moving_time || 0) / 60), // Convert seconds to minutes
+          aiComment: await generateAIComment(stravaActivity),
+          elevation: stravaActivity.total_elevation_gain,
+          heartRate: stravaActivity.average_heartrate,
+          type: mapActivityType(stravaActivity.type)
+        }))
+      );
       
       setActivities(transformedActivities);
     } catch (err) {
