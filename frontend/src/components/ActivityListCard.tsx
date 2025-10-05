@@ -11,7 +11,7 @@ import "../styles/activity.css";
  * @param unit "km" or "mi" (default: "km")
  * @returns Formatted pace string like "5:23 /km" or "8:45 /mi"
  */
-export function calculatePace(
+function calculatePace(
   distanceMeters: number,
   movingTimeSeconds: number,
   unit: "km" | "mi" = "km"
