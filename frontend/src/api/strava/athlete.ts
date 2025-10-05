@@ -1,6 +1,6 @@
 import { stravaFetch } from "./client";
-import { type StravaAthlete } from "../../types/strava-api";
+import { type Athlete } from "../../types/strava";
 
 export async function getAthlete(accessToken: string) {
-  return stravaFetch<StravaAthlete>("/athlete", accessToken);
+  return stravaFetch<Athlete>("/athlete", accessToken);
 }

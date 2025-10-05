@@ -28,16 +28,16 @@ export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({ acti
       console.error('Failed to generate suggestion:', error);
       // Calculate recent activity metrics
       const recentActivities = activities.slice(0, 7); // Last 7 activities
-      const totalDistance = recentActivities.reduce((sum, activity) => sum + activity.distance, 0);
+      const totalDistance = recentActivities.reduce((sum, activity) => sum + (activity.distance ?? 0), 0);
       const avgDistance = totalDistance / recentActivities.length;
-      const totalDuration = recentActivities.reduce((sum, activity) => sum + activity.duration, 0);
+      const totalDuration = recentActivities.reduce((sum, activity) => sum + (activity.moving_time ?? 0), 0);
       const avgDuration = totalDuration / recentActivities.length;
   
       // Check for patterns and generate recommendations
       if (recentActivities.length >= 3) {
         // Check for consistency in past week
-        const lastActivity = new Date(recentActivities[0].date);
-        const firstActivity = new Date(recentActivities[recentActivities.length - 1].date);
+        const lastActivity = new Date(recentActivities[0].start_date);
+        const firstActivity = new Date(recentActivities[recentActivities.length - 1].start_date);
         const daysDiff = Math.ceil((lastActivity.getTime() - firstActivity.getTime()) / (1000 * 3600 * 24));
   
         if (daysDiff <= 7 && recentActivities.length >= 3) {
@@ -69,8 +69,7 @@ export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({ acti
       const runningActivities = recentActivities.filter(a => a.type === 'running');
       if (runningActivities.length > 0) {
         const avgPace = runningActivities.reduce((sum, activity) => {
-          const [min, sec] = activity.pace.split(':').map(Number);
-          return sum + (min * 60 + sec);
+          return sum + (activity.moving_time ?? 0);
         }, 0) / runningActivities.length;
   
         const avgPaceMin = Math.floor(avgPace / 60);
