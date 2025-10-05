@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getActivities } from '../api/strava';
+import { StravaClient } from '../api/strava/client';
 import type { Activity } from '../types/strava';
 //import { GeminiClient } from '../api/gemini/client';
 
@@ -56,7 +56,8 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
     setError(null);
     
     try {
-      const stravaActivities = await getActivities(token, 5, 1);
+      const client = new StravaClient(token);
+      const stravaActivities = await client.fetchActivities(5, 1);
       
       setActivities(stravaActivities);
     } catch (err) {
