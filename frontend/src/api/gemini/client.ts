@@ -67,7 +67,7 @@ export class GeminiClient {
     this.modelName = modelName;
   }
 
-  private async generateFromPrompt(prompt: string): Promise<string> {
+  private async _generateFromPrompt(prompt: string): Promise<string> {
     const model = this.client.getGenerativeModel({ model: this.modelName });
     const result = await model.generateContent(prompt);
     console.log("Gemini response:", result.response.text());
@@ -81,7 +81,7 @@ async generateComment(activity: Activity): Promise<string> {
 
       ${ActivityToString(activity)}
     `;
-    return this.generateFromPrompt(prompt);
+    return this._generateFromPrompt(prompt);
   }
 
   async generateComments(activities: Activity[]): Promise<string> {
@@ -94,7 +94,7 @@ async generateComment(activity: Activity): Promise<string> {
 
       ${activities.map(a => ActivityToString(a)).join("\n")}
     `;
-    return this.generateFromPrompt(prompt);
+    return this._generateFromPrompt(prompt);
   }
 
   async generateActivity(activities: Activity[]): Promise<string> {
@@ -104,6 +104,6 @@ async generateComment(activity: Activity): Promise<string> {
 
       ${activities.map(a => ActivityToString(a)).join("\n")}
     `;
-    return this.generateFromPrompt(prompt);
+    return this._generateFromPrompt(prompt);
   }
 }

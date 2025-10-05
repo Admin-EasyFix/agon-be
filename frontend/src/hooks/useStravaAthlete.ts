@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getAthlete } from "../api/strava";
+import { StravaClient } from "../api/strava/client";
 import type { Athlete } from "../types/strava";
 
 interface UseAthleteResult {
@@ -24,8 +24,9 @@ export function useAthlete(token: string | null): UseAthleteResult {
     setError(null);
 
     try {
-      const Athlete = await getAthlete(token);
-      setAthlete(Athlete);
+      const client = new StravaClient(token);
+      const athleteData = await client.fetchAthlete();
+      setAthlete(athleteData);
     } catch (err) {
       console.error("Error fetching athlete:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch athlete");
