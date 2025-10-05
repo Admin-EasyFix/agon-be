@@ -1,10 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { StravaActivity } from "../../types/strava-api";
 import type { Activity } from "../../types/strava";
 
 const GEMINI_MODEL = "gemini-2.0-flash";
 
-export function StravaActivityToString(activity: StravaActivity): string {
+export function ActivityToString(activity: Activity): string {
     const parts: string[] = [`Type: ${activity.type}`];
     if (activity.distance !== undefined) {
         parts.push(`Distance: ${activity.distance} km`);
@@ -58,20 +57,6 @@ export function StravaActivityToString(activity: StravaActivity): string {
     return parts.join(", ");
 }
 
-export function ActivityToString(activity: Activity): string {
-    const parts: string[] = [`Type: ${activity.type}`];
-    parts.push(`Distance: ${activity.distance} km`);
-    parts.push(`Pace: ${activity.pace}`);
-    parts.push(`Duration: ${activity.duration} min`);
-    if (activity.elevation !== undefined) {
-        parts.push(`Elevation: ${activity.elevation} m`);
-    }
-    if (activity.heartRate !== undefined) {
-        parts.push(`Heart Rate: ${activity.heartRate} bpm`);
-    }
-    return parts.join(", ");
-}
-
 export class GeminiClient {
   private client: GoogleGenerativeAI;
   private modelName: string;
@@ -85,20 +70,21 @@ export class GeminiClient {
   private async generateFromPrompt(prompt: string): Promise<string> {
     const model = this.client.getGenerativeModel({ model: this.modelName });
     const result = await model.generateContent(prompt);
+    console.log("Gemini response:", result.response.text());
     return result.response.text();
   }
 
-async generateComment(activity: StravaActivity): Promise<string> {
+async generateComment(activity: Activity): Promise<string> {
     const prompt = `
       You are an assistant that reviews user activities.
       Given the following activity, generate a short insightful comment:
 
-      ${StravaActivityToString(activity)}
+      ${ActivityToString(activity)}
     `;
     return this.generateFromPrompt(prompt);
   }
 
-  async generateComments(activities: StravaActivity[]): Promise<string> {
+  async generateComments(activities: Activity[]): Promise<string> {
     if (activities.length === 0) {
       return "No activities available to comment on.";
     }
@@ -106,17 +92,7 @@ async generateComment(activity: StravaActivity): Promise<string> {
       You are an assistant that reviews user activities.
       Given the following list of activities, generate a list of short insightful comments:
 
-      ${activities.map(a => StravaActivityToString(a)).join("\n")}
-    `;
-    return this.generateFromPrompt(prompt);
-  }
-
-  async generateStravaActivity(activities: StravaActivity[]): Promise<string> {
-    const prompt = `
-      You are an assistant that suggests new activities.
-      Based on the following activities, suggest one new activity:
-
-      ${activities.map(a => StravaActivityToString(a)).join("\n")}
+      ${activities.map(a => ActivityToString(a)).join("\n")}
     `;
     return this.generateFromPrompt(prompt);
   }

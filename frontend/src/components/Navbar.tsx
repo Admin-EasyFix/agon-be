@@ -2,13 +2,13 @@ import { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import doveIcon from '../assets/golden_dove.svg';
 import userIcon from '../assets/user.png';
-import { useStravaAthlete } from "../hooks/useStravaAthlete";
+import { useAthlete } from "../hooks/useStravaAthlete";
 import "../styles/navbar.css";
 
 function Navbar() {
   const { token, logOut } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
-  const { athlete, loading, error: apiError, refetch } = useStravaAthlete(token);
+  const { athlete, loading, error: apiError, refetch } = useAthlete(token);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const toggleMenu = () => setOpen((prev) => !prev);
 

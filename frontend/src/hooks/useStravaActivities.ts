@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getActivities } from '../api/strava';
 import type { Activity } from '../types/strava';
-import type { StravaActivity } from '../types/strava-api';
 import { GeminiClient } from '../api/gemini/client';
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -40,7 +39,7 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
     return typeMap[stravaType] || 'other';
   };
 
-  const generateAIComment = async (activity: StravaActivity): Promise<string> => {
+  const generateAIComment = async (activity: Activity): Promise<string> => {
     try {
       const ai = new GeminiClient(apiKey);
       return await ai.generateComment(activity);
@@ -81,23 +80,7 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
     try {
       const stravaActivities = await getActivities(token, 5, 1);
       
-      // Transform Strava activities to our Activity interface
-      const transformedActivities: Activity[] = await Promise.all(
-        stravaActivities.map(async (stravaActivity: StravaActivity) => ({
-          id: stravaActivity.id.toString(),
-          name: stravaActivity.name,
-          date: stravaActivity.start_date,
-          distance: stravaActivity.distance ? Math.round((stravaActivity.distance / 1000) * 10) / 10 : 0, // Convert meters to km
-          pace: calculatePace(stravaActivity.distance || 0, stravaActivity.moving_time || 0),
-          duration: Math.round((stravaActivity.moving_time || 0) / 60), // Convert seconds to minutes
-          aiComment: await generateAIComment(stravaActivity),
-          elevation: stravaActivity.total_elevation_gain,
-          heartRate: stravaActivity.average_heartrate,
-          type: mapActivityType(stravaActivity.type)
-        }))
-      );
-      
-      setActivities(transformedActivities);
+      setActivities(stravaActivities);
     } catch (err) {
       console.error('Error fetching activities:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch activities');
