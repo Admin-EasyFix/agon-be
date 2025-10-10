@@ -1,4 +1,5 @@
 import { StravaActivity } from '../types/StravaActivity';
+import createError from 'http-errors';
 
 const STRAVA_API_BASE = 'https://www.strava.com/api/v3';
 
@@ -19,9 +20,11 @@ export class StravaClient {
     });
 
     if (!response.ok) {
-      const errorBody = await response.text();
-      console.error(`Strava API request failed with status ${response.status}: ${errorBody}`);
-      throw new Error(`Failed to fetch activities from Strava. Status: ${response.status}`);
+      if (response.status === 401) {
+        throw createError(401, 'Unauthorized: Invalid or expired Strava token.');
+      }
+      console.error(`Strava API request failed with status ${response.status}: ${response.statusText}`);
+      throw createError(response.status, `Failed to fetch from Strava: ${response.statusText}`);
     }
 
     return response.json() as Promise<StravaActivity[]>;

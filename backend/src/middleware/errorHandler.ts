@@ -10,5 +10,5 @@ export const errorHandler = (err: AppError, req: Request, res: Response, next: N
   
   console.error(err.stack);
 
-  res.status(status).json({ message });
+  res.status(status).json({ status, message });
 };

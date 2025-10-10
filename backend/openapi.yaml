@@ -41,9 +41,17 @@ paths:
                 items:
                   $ref: '#/components/schemas/Activity'
         '401':
-          description: Unauthorized - The Bearer token is missing or invalid.
+          description: Unauthorized. The Bearer token is missing, invalid, or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          description: Internal Server Error - Failed to fetch activities.
+          description: Internal Server Error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /api/suggest:
     get:
@@ -61,9 +69,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/Activity'
         '401':
-          description: Unauthorized - The Bearer token is missing or invalid.
+          description: Unauthorized. The Bearer token is missing, invalid, or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
-          description: Internal Server Error - Failed to generate suggestion.
+          description: Internal Server Error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   securitySchemes:
@@ -110,3 +126,15 @@ components:
           type: string
           enum: [running, cycling, swimming, hiking, other]
           description: The type of the activity.
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code.
+          example: 401
+        message:
+          type: string
+          description: A human-readable error message.
+          example: "Unauthorized: Invalid or expired Strava token."

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { StravaService } from '../services/stravaService';
+import createError from 'http-errors';
 import { AIService } from '../services/aiService';
 
 export class StravaController {
@@ -21,9 +22,7 @@ export class StravaController {
       const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
   
       if (!token) {
-        const error = new Error('Bearer token is required');
-        (error as any).status = 401; // Unauthorized
-        throw error;
+        throw createError(401, 'Bearer token is required');
       }
   
       const activities = await this.stravaService.getActivities(token, 10);
@@ -44,9 +43,7 @@ export class StravaController {
       const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
   
       if (!token) {
-        const error = new Error('Bearer token is required');
-        (error as any).status = 401;
-        throw error;
+        throw createError(401, 'Bearer token is required');
       }
   
       const activities = await this.stravaService.getActivities(token, 10);
