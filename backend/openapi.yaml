@@ -27,15 +27,9 @@ paths:
     get:
       summary: Get User Activities
       description: Fetches a list of the authenticated user's most recent activities from Strava.
-      tags:
-        - Activities
-      parameters:
-        - name: token
-          in: query
-          required: true
-          description: The user's Strava access token.
-          schema:
-            type: string
+      tags: [Strava]
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: A list of user activities.
@@ -45,8 +39,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Activity'
-        '400':
-          description: Bad Request - The access token is missing.
+        '401':
+          description: Unauthorized - The Bearer token is missing or invalid.
         '500':
           description: Internal Server Error - Failed to fetch activities.
 
@@ -54,15 +48,9 @@ paths:
     get:
       summary: Get Activity Suggestion
       description: Generates an AI-powered suggestion for the user's next activity based on their recent training history.
-      tags:
-        - Activities
-      parameters:
-        - name: token
-          in: query
-          required: true
-          description: The user's Strava access token.
-          schema:
-            type: string
+      tags: [AI]
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: A suggested activity.
@@ -70,8 +58,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Activity'
-        '400':
-          description: Bad Request - The access token is missing.
+        '401':
+          description: Unauthorized - The Bearer token is missing or invalid.
         '500':
           description: Internal Server Error - Failed to generate suggestion.
 
@@ -79,15 +67,9 @@ paths:
     get:
       summary: Get Training Analytics
       description: Provides detailed analytics based on the user's recent activities.
-      tags:
-        - Analytics
-      parameters:
-        - name: token
-          in: query
-          required: true
-          description: The user's Strava access token.
-          schema:
-            type: string
+      tags: [AI]
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: Detailed training analytics.
@@ -95,12 +77,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AnalyticsResponse'
-        '400':
-          description: Bad Request - The access token is missing.
+        '401':
+          description: Unauthorized - The Bearer token is missing or invalid.
         '500':
           description: Internal Server Error - Failed to fetch analytics.
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # Or Opaque, depending on the token type
+      description: "User's Strava access token."
+
   schemas:
     Activity:
       type: object
