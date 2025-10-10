@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: Agon Backend API
+  description: API for the Agon fitness dashboard, providing access to Strava data, AI-powered suggestions, and analytics.
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+
+paths:
+  /:
+    get:
+      summary: Health Check
+      description: Checks if the API is running and returns a welcome message.
+      tags:
+        - General
+      responses:
+        '200':
+          description: API is up and running.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Welcome to the API!"
+
+  /api/strava/activities:
+    get:
+      summary: Get User Activities
+      description: Fetches a list of the authenticated user's most recent activities from Strava.
+      tags:
+        - Strava
+      parameters:
+        - name: token
+          in: query
+          required: true
+          description: The user's Strava access token.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of user activities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+        '400':
+          description: Bad Request - The access token is missing.
+        '500':
+          description: Internal Server Error - Failed to fetch activities.
+
+  /api/suggest:
+    get:
+      summary: Get Activity Suggestion
+      description: Generates an AI-powered suggestion for the user's next activity based on their recent training history.
+      tags:
+        - AI
+      parameters:
+        - name: token
+          in: query
+          required: true
+          description: The user's Strava access token.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A suggested activity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '400':
+          description: Bad Request - The access token is missing.
+        '500':
+          description: Internal Server Error - Failed to generate suggestion.
+
+  /api/analytics:
+    get:
+      summary: Get Training Analytics
+      description: Provides detailed analytics based on the user's recent activities.
+      tags:
+        - AI
+      parameters:
+        - name: token
+          in: query
+          required: true
+          description: The user's Strava access token.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed training analytics.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsResponse'
+        '400':
+          description: Bad Request - The access token is missing.
+        '500':
+          description: Internal Server Error - Failed to fetch analytics.
+
+components:
+  schemas:
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the activity.
+        name:
+          type: string
+          description: The name of the activity.
+        date:
+          type: string
+          format: date-time
+          description: The start date and time of the activity in ISO 8601 format.
+        distance:
+          type: number
+          format: float
+          description: The distance of the activity in kilometers.
+        pace:
+          type: string
+          description: The average pace of the activity (e.g., 'min:ss/km').
+        duration:
+          type: number
+          description: The duration of the activity in minutes.
+        description:
+          type: string
+          description: An AI-generated or fallback comment about the activity.
+        elevation:
+          type: number
+          description: Total elevation gain in meters.
+        heartRate:
+          type: number
+          description: Average heart rate in beats per minute.
+        type:
+          type: string
+          enum: [running, cycling, swimming, hiking, other]
+          description: The type of the activity.
+    Analytics:
+      type: object
+      properties:
+        weeklyVolume:
+          type: number
+          description: Total distance in kilometers for the last 7 days.
+        averagePace:
+          type: string
+          description: Average pace for running activities ('min:ss/km').
+        mostCommonType:
+          type: string
+          description: The most frequent activity type.
+        trainingStreaks:
+          type: number
+          description: The longest streak of consecutive training days.
+        recoveryDays:
+          type: number
+          description: Number of days without activity in the last 7 days.
+    AnalyticsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        analytics:
+          $ref: '#/components/schemas/Analytics'
+        totalActivities:
+          type: number
