@@ -65,26 +65,6 @@ paths:
         '500':
           description: Internal Server Error - Failed to generate suggestion.
 
-  /api/analytics:
-    get:
-      summary: Get Training Analytics
-      description: Provides detailed analytics based on the user's recent activities.
-      tags: 
-        - Analytics
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: Detailed training analytics.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AnalyticsResponse'
-        '401':
-          description: Unauthorized - The Bearer token is missing or invalid.
-        '500':
-          description: Internal Server Error - Failed to fetch analytics.
-
 components:
   securitySchemes:
     BearerAuth:
@@ -130,30 +110,3 @@ components:
           type: string
           enum: [running, cycling, swimming, hiking, other]
           description: The type of the activity.
-    Analytics:
-      type: object
-      properties:
-        weeklyVolume:
-          type: number
-          description: Total distance in kilometers for the last 7 days.
-        averagePace:
-          type: string
-          description: Average pace for running activities ('min:ss/km').
-        mostCommonType:
-          type: string
-          description: The most frequent activity type.
-        trainingStreaks:
-          type: number
-          description: The longest streak of consecutive training days.
-        recoveryDays:
-          type: number
-          description: Number of days without activity in the last 7 days.
-    AnalyticsResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        analytics:
-          $ref: '#/components/schemas/Analytics'
-        totalActivities:
-          type: number

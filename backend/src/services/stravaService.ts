@@ -41,7 +41,7 @@ export class StravaService {
           : 0, // Convert meters to km
         pace: this.calculatePace(stravaActivity.distance || 0, stravaActivity.moving_time || 0),
         duration: Math.round((stravaActivity.moving_time || 0) / 60), // Convert seconds to minutes
-        description: comments[activityId] || "Great workout!", // Use batch-generated comment or a fallback
+        description: comments[activityId] || this.aiService.generateCommentForActivity(stravaActivity), // Use batch-generated comment or a fallback
         elevation: stravaActivity.total_elevation_gain,
         heartRate: stravaActivity.average_heartrate,
         type: this.mapActivityType(stravaActivity.type),

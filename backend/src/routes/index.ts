@@ -12,5 +12,4 @@ export function setRoutes(app: Application) {
     // Strava API endpoints
     app.get('/api/strava/activities', stravaController.getActivities.bind(stravaController));
     app.get('/api/suggest', stravaController.getSuggestion.bind(stravaController));
-    app.get('/api/analytics', stravaController.getAnalytics.bind(stravaController));
 }
