@@ -12,21 +12,34 @@ export class StravaClient {
    */
   async fetchActivities(accessToken: string, perPage: number = 10): Promise<StravaActivity[]> {
     const url = `${STRAVA_API_BASE}/athlete/activities?per_page=${perPage}`;
-    
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw createError(401, 'Unauthorized: Invalid or expired Strava token.');
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw createError(401, 'Unauthorized: Invalid or expired Strava token.');
+        }
+        console.error(`Strava API request failed with status ${response.status}: ${response.statusText}`);
+        throw createError(response.status, `Failed to fetch from Strava: ${response.statusText}`);
       }
-      console.error(`Strava API request failed with status ${response.status}: ${response.statusText}`);
-      throw createError(response.status, `Failed to fetch from Strava: ${response.statusText}`);
-    }
 
-    return response.json() as Promise<StravaActivity[]>;
+      try {
+        const data = await response.json();
+        return data as StravaActivity[];
+      } catch (e) {
+        console.error('Strava API returned invalid JSON');
+        throw createError(502, 'Invalid response from Strava API');
+      }
+    } catch (err: any) {
+      if (err.status) {
+        throw err;
+      }
+      console.error(`Network error contacting Strava API: ${err?.message || err}`);
+      throw createError(502, 'Unable to reach Strava API');
+    }
   }
 }
