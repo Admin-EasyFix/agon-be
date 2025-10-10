@@ -27,9 +27,13 @@ export class StravaService {
    * Transform Strava activities to our internal Activity format
    */
   async transformActivities(stravaActivities: StravaActivity[]): Promise<Activity[]> {
-    const transformedActivities = await Promise.all(stravaActivities.map(async (stravaActivity) => {
+    // Generate all comments in a single batch call
+    const comments = await this.aiService.generateCommentsForActivitiesBatch(stravaActivities);
+
+    const transformedActivities = stravaActivities.map((stravaActivity) => {
+      const activityId = stravaActivity.id.toString();
       return {
-        id: stravaActivity.id.toString(),
+        id: activityId,
         name: stravaActivity.name,
         date: stravaActivity.start_date,
         distance: stravaActivity.distance 
@@ -37,12 +41,12 @@ export class StravaService {
           : 0, // Convert meters to km
         pace: this.calculatePace(stravaActivity.distance || 0, stravaActivity.moving_time || 0),
         duration: Math.round((stravaActivity.moving_time || 0) / 60), // Convert seconds to minutes
-        description: await this.aiService.generateCommentForActivity(stravaActivity),
+        description: comments[activityId] || "Great workout!", // Use batch-generated comment or a fallback
         elevation: stravaActivity.total_elevation_gain,
         heartRate: stravaActivity.average_heartrate,
         type: this.mapActivityType(stravaActivity.type),
       };
-    }));
+    });
     return transformedActivities;
   }
 

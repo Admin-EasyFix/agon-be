@@ -22,8 +22,13 @@ class FakeStravaClientError {
 }
 
 class FakeAIService {
-  async generateCommentForActivity(): Promise<string> {
-    return 'Great job!';
+  async generateCommentsForActivitiesBatch(activities: StravaActivity[]): Promise<Record<string, string>> {
+    const comments: Record<string, string> = {};
+    activities.forEach(activity => {
+      // Simulate returning a specific comment for each activity based on its ID
+      comments[activity.id.toString()] = `AI comment for ${activity.id}`;
+    });
+    return comments;
   }
 }
 
@@ -82,7 +87,7 @@ describe('StravaService', () => {
       distance: 10.0,
       pace: '5:00',
       duration: 50,
-      description: 'Great job!',
+      description: 'AI comment for 123',
       elevation: 100,
       heartRate: 145,
       type: 'running'
@@ -96,7 +101,7 @@ describe('StravaService', () => {
       distance: 5.6,
       pace: '3:00',
       duration: 17,
-      description: 'Great job!',
+      description: 'AI comment for 456',
       elevation: 50,
       heartRate: 135,
       type: 'cycling'
@@ -154,7 +159,7 @@ describe('StravaService', () => {
       duration: 0,
       pace: '--:--',
       type: 'running',
-      description: 'Great job!'
+      description: 'AI comment for 789'
     });
 
     expect(activity.elevation).toBeUndefined();

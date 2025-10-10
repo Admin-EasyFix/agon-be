@@ -193,4 +193,47 @@ export class AIService {
       }
     }
   }
+
+  /**
+   * Generates insightful comments for a batch of activities.
+   */
+  async generateCommentsForActivitiesBatch(activities: StravaActivity[]): Promise<Record<string, string>> {
+    if (activities.length === 0) {
+      return {};
+    }
+
+    const activitiesForPrompt = activities.map(activity => ({
+      id: activity.id,
+      name: activity.name,
+      type: activity.type,
+      distance: activity.distance,
+      moving_time: activity.moving_time,
+      average_heartrate: activity.average_heartrate,
+      total_elevation_gain: activity.total_elevation_gain,
+    }));
+
+    const prompt = `
+      As a friendly and encouraging fitness coach, analyze the following activities and for each one, provide a one-sentence, insightful comment.
+      Focus on a positive aspect or offer a small piece of encouragement.
+
+      Activities Data (JSON format):
+      ${JSON.stringify(activitiesForPrompt, null, 2)}
+
+      Generate a response in a valid JSON format where each key is an activity ID and the value is the comment string. Example:
+      {
+        "12345": "Great pace on your run!",
+        "67890": "Awesome elevation gain on that hike."
+      }
+
+      Do not include any text outside of the JSON object. The keys in the JSON object must be the IDs of the activities provided.
+    `;
+
+    try {
+      const jsonResponse = await this.geminiClient.generateContent(prompt);
+      return JSON.parse(jsonResponse) as Record<string, string>;
+    } catch (error) {
+      console.error("Failed to generate AI comments in batch:", error);
+      return {}; // Return empty object on failure
+    }
+  }
 }
