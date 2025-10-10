@@ -27,7 +27,7 @@ paths:
     get:
       summary: Get User Activities
       description: Fetches a list of the authenticated user's most recent activities from Strava.
-      tags: [Strava]
+      tags: Activities
       security:
         - BearerAuth: []
       responses:
@@ -48,7 +48,7 @@ paths:
     get:
       summary: Get Activity Suggestion
       description: Generates an AI-powered suggestion for the user's next activity based on their recent training history.
-      tags: [AI]
+      tags: Activities
       security:
         - BearerAuth: []
       responses:
@@ -67,7 +67,7 @@ paths:
     get:
       summary: Get Training Analytics
       description: Provides detailed analytics based on the user's recent activities.
-      tags: [AI]
+      tags: Analytics
       security:
         - BearerAuth: []
       responses:
