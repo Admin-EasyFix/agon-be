@@ -6,6 +6,7 @@ dotenv.config();
 export class GeminiClient {
   private genAI: GoogleGenerativeAI;
   private generationConfig: GenerationConfig;
+  private model: string;
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -17,6 +18,7 @@ export class GeminiClient {
       // Ensure the model returns a JSON object.
       responseMimeType: "application/json",
     };
+    this.model = "gemini-2.0-flash";
   }
 
   /**
@@ -27,7 +29,7 @@ export class GeminiClient {
   async generateContent(prompt: string): Promise<string> {
     try {
       const model = this.genAI.getGenerativeModel({ 
-        model: "gemini-2.0-flash",
+        model: this.model,
         generationConfig: this.generationConfig
       });
       const result = await model.generateContent(prompt);
