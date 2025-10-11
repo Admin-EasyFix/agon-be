@@ -1,12 +1,15 @@
 import { Activity} from '../types/Activity';
 import { GeminiClient } from '../clients/geminiClient';
 import { StravaActivity } from '../types/StravaActivity';
+import { ActivityMapper } from '../mappers/activityMapper';
 
 export class AIService {
   private geminiClient: GeminiClient;
+  private activityMapper: ActivityMapper;
 
   constructor() {
     this.geminiClient = new GeminiClient();
+    this.activityMapper = new ActivityMapper(this);
   }
 
   /**
@@ -108,15 +111,7 @@ export class AIService {
       return {};
     }
 
-    const activitiesForPrompt = activities.map(activity => ({
-      id: activity.id,
-      name: activity.name,
-      type: activity.type,
-      distance: activity.distance,
-      moving_time: activity.moving_time,
-      average_heartrate: activity.average_heartrate,
-      total_elevation_gain: activity.total_elevation_gain,
-    }));
+    const activitiesForPrompt = activities.map(activity => this.activityMapper.toActivityPromt(activity));
 
     const prompt = `
       As a friendly and encouraging fitness coach, analyze the following activities and for each one, provide a one-sentence, insightful comment.
