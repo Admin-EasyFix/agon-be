@@ -28,15 +28,14 @@ export class ActivityMapper {
     }
 
     return stravaActivities.map(stravaActivity => {
-      const activityId = stravaActivity.id.toString();
       return {
-        id: activityId,
+        id: stravaActivity.id,
         name: stravaActivity.name,
-        date: stravaActivity.start_date,
+        date: stravaActivity.start_date_local,
         distance: stravaActivity.distance ? Math.round((stravaActivity.distance / 1000) * 10) / 10 : 0,
         pace: this.calculatePace(stravaActivity.distance || 0, stravaActivity.moving_time || 0),
         duration: Math.round((stravaActivity.moving_time || 0) / 60),
-        description: comments[activityId] || this.aiService.generateCommentForActivity(stravaActivity),
+        description: comments[stravaActivity.id] || this.aiService.generateCommentForActivity(stravaActivity),
         elevation: stravaActivity.total_elevation_gain,
         heartRate: stravaActivity.average_heartrate,
         type: this.mapActivityType(stravaActivity.type),

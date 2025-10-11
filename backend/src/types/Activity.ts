@@ -1,6 +1,6 @@
 import { ActivityType } from './activityType';
 export interface Activity {
-  id: string;
+  id: number;
   name: string;
   date: string; // ISO date string
   distance: number; // Distance in kilometers

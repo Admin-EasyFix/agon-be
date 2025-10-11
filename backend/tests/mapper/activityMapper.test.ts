@@ -40,9 +40,9 @@ describe('ActivityMapper', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
-      id: '123',
+      id: 123,
       name: 'Morning Run',
-      date: '2023-01-01T00:00:00Z',
+      date: '2023-01-01T01:00:00Z',
       distance: 10.0,
       pace: '5:00',
       duration: 50,
@@ -60,7 +60,7 @@ describe('ActivityMapper', () => {
       id: 789,
       name: 'Untitled',
       type: 'Run',
-      start_date: '2023-01-03T00:00:00Z',
+      start_date: '2023-01-03T01:00:00Z',
       start_date_local: '2023-01-03T01:00:00Z',
       timezone: 'UTC',
       utc_offset: 0
@@ -71,9 +71,9 @@ describe('ActivityMapper', () => {
     const activity = result[0];
 
     expect(activity).toMatchObject({
-      id: '789',
+      id: 789,
       name: 'Untitled',
-      date: '2023-01-03T00:00:00Z',
+      date: '2023-01-03T01:00:00Z',
       distance: 0,
       duration: 0,
       pace: '--:--',
