@@ -4,12 +4,10 @@ import { AIService } from './aiService';
 import { ActivityMapper } from '../mappers/activityMapper';
 
 export class StravaService {
-  private stravaClient: StravaClient;
   private aiService: AIService;
   private activityMapper: ActivityMapper;
 
   constructor() {
-    this.stravaClient = new StravaClient();
     this.aiService = new AIService();
     this.activityMapper = new ActivityMapper(this.aiService);
   }
@@ -21,7 +19,8 @@ export class StravaService {
    * @returns A promise that resolves to an array of transformed activities.
    */
   async getActivities(accessToken: string, perPage: number = 10): Promise<Activity[]> {
-    const stravaActivities = await this.stravaClient.fetchActivities(accessToken, perPage);
+    const stravaClient = new StravaClient(accessToken);
+    const stravaActivities = await stravaClient.fetchActivities(perPage);
     return this.activityMapper.toActivities(stravaActivities, { withAi: true });
   }
 }
