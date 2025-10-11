@@ -1,6 +1,7 @@
 import { Activity } from '../types/Activity';
 import { StravaActivity } from '../types/StravaActivity';
 import { AIService } from '../services/aiService';
+import { ActivityType } from '../types/activityType';
 
 export class ActivityMapper {
   private aiService: AIService;
@@ -56,14 +57,14 @@ export class ActivityMapper {
   }
 
 
-  private mapActivityType(stravaType: string): Activity['type'] {
-    const typeMap: Record<string, Activity['type']> = {
-      Run: 'running',
-      Ride: 'cycling',
-      Swim: 'swimming',
-      Hike: 'hiking',
-      Walk: 'hiking',
+  private mapActivityType(stravaType: string): ActivityType {
+    const typeMap: Record<string, ActivityType> = {
+      Run: ActivityType.Running,
+      Ride: ActivityType.Cycling,
+      Swim: ActivityType.Swimming,
+      Hike: ActivityType.Hiking,
+      Walk: ActivityType.Hiking,
     };
-    return typeMap[stravaType] || 'other';
+    return typeMap[stravaType] || ActivityType.Other;
   }
 }

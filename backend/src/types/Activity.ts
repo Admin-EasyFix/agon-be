@@ -1,3 +1,4 @@
+import { ActivityType } from './activityType';
 export interface Activity {
   id: string;
   name: string;
@@ -8,5 +9,5 @@ export interface Activity {
   description: string;
   elevation?: number;
   heartRate?: number;
-  type: 'running' | 'cycling' | 'swimming' | 'hiking' | 'other';
+  type: ActivityType;
 }

@@ -1,4 +1,5 @@
 import { Activity } from '../types/Activity';
+import { ActivityType } from '../types/activityType';
 
 export const WELCOME_SUGGESTION: Activity = {
   id: 'suggestion-0',
@@ -8,7 +9,7 @@ export const WELCOME_SUGGESTION: Activity = {
   pace: "6:00",
   duration: 30,
   description: "Log your first activity to get personalized suggestions.",
-  type: 'running'
+  type: ActivityType.Running
 };
 
 export const FALLBACK_SUGGESTION: Activity = {
@@ -19,7 +20,7 @@ export const FALLBACK_SUGGESTION: Activity = {
   pace: "7:00",
   duration: 21,
   description: "A light activity to keep you moving. Keep up the great work!",
-  type: 'running'
+  type: ActivityType.Running
 };
 
 export const FALLBACK_COMMENTS = [

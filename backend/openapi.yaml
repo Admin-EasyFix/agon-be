@@ -123,9 +123,7 @@ components:
           type: number
           description: Average heart rate in beats per minute.
         type:
-          type: string
-          enum: [running, cycling, swimming, hiking, other]
-          description: The type of the activity.
+          $ref: '#/components/schemas/ActivityType'
     Error:
       type: object
       properties:
@@ -138,3 +136,12 @@ components:
           type: string
           description: A human-readable error message.
           example: "Unauthorized: Invalid or expired Strava token."
+    ActivityType:
+      type: string
+      enum:
+        - running
+        - cycling
+        - swimming
+        - hiking
+        - other
+      description: The type of the activity.
