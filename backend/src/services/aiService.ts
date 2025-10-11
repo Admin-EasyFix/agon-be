@@ -111,7 +111,7 @@ export class AIService {
       return {};
     }
 
-    const activitiesForPrompt = activities.map(activity => this.activityMapper.toActivityPromt(activity));
+    const activitiesForPrompt = await this.activityMapper.toActivities(activities, { withAi: false });
 
     const prompt = `
       As a friendly and encouraging fitness coach, analyze the following activities and for each one, provide a one-sentence, insightful comment.

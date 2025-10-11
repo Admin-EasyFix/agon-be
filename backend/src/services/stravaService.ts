@@ -1,5 +1,4 @@
 import { Activity } from '../types/Activity';
-import { StravaActivity } from '../types/StravaActivity';
 import { StravaClient } from '../clients/stravaClient';
 import { AIService } from './aiService';
 import { ActivityMapper } from '../mappers/activityMapper';
@@ -23,6 +22,6 @@ export class StravaService {
    */
   async getActivities(accessToken: string, perPage: number = 10): Promise<Activity[]> {
     const stravaActivities = await this.stravaClient.fetchActivities(accessToken, perPage);
-    return this.activityMapper.toActivity(stravaActivities);
+    return this.activityMapper.toActivities(stravaActivities, { withAi: true });
   }
 }

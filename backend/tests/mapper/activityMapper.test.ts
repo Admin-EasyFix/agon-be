@@ -36,7 +36,7 @@ describe('ActivityMapper', () => {
     ];
 
     const mapper = new ActivityMapper(new FakeAIService() as any);
-    const result = await mapper.toActivity(activities);
+    const result = await mapper.toActivities(activities);
 
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
@@ -46,7 +46,7 @@ describe('ActivityMapper', () => {
       distance: 10.0,
       pace: '5:00',
       duration: 50,
-      description: 'AI comment for 123',
+      description: 'Fallback comment for 123',
       elevation: 100,
       heartRate: 145,
       type: 'running'
@@ -66,7 +66,7 @@ describe('ActivityMapper', () => {
       utc_offset: 0
     };
 
-    const result = await mapper.toActivity([incomplete]);
+    const result = await mapper.toActivities([incomplete]);
     expect(result).toHaveLength(1);
     const activity = result[0];
 
@@ -78,7 +78,7 @@ describe('ActivityMapper', () => {
       duration: 0,
       pace: '--:--',
       type: 'running',
-      description: 'AI comment for 789'
+      description: 'Fallback comment for 789'
     });
 
     expect(activity.elevation).toBeUndefined();

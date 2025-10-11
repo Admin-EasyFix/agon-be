@@ -23,7 +23,7 @@ class FakeStravaClientError {
 }
 
 class FakeActivityMapper {
-  async toActivity(activities: StravaActivity[]) {
+  async toActivities(activities: StravaActivity[], options?: { withAi: boolean }) {
     return activities.map(a => ({ ...a, transformed: true }));
   }
 }
