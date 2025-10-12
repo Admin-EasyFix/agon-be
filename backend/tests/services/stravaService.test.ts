@@ -1,26 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { StravaService } from '../../src/services/stravaService';
-import { ActivityMapper } from '../../src/mappers/activityMapper';
 import type { StravaActivity } from '../../src/types/StravaActivity';
+import { StravaClient } from '../../src/clients/stravaClient';
 
-class FakeStravaClientSuccess {
-  public lastToken: string | null = null;
-  public lastPerPage: number | null = null;
-
-  constructor(private activities: StravaActivity[]) {}
-
-  async fetchActivities(accessToken: string, perPage: number = 10): Promise<StravaActivity[]> {
-    this.lastToken = accessToken;
-    this.lastPerPage = perPage;
-    return this.activities;
-  }
-}
-
-class FakeStravaClientError {
-  async fetchActivities(): Promise<StravaActivity[]> {
-    throw new Error('fetch failed');
-  }
-}
+vi.mock('../../src/clients/stravaClient');
 
 class FakeActivityMapper {
   async toActivities(activities: StravaActivity[], options?: { withAi: boolean }) {
@@ -62,22 +45,31 @@ describe('StravaService', () => {
     ];
 
     const service = new StravaService();
-    const fakeClient = new FakeStravaClientSuccess(activities);
-    (service as any).stravaClient = fakeClient;
     (service as any).activityMapper = new FakeActivityMapper();
+
+    const mockFetchActivities = vi.fn().mockResolvedValue(activities);
+    (StravaClient as unknown as any).mockImplementation(() => {
+      return {
+        fetchActivities: mockFetchActivities,
+      };
+    });
 
     const token = 'test-token';
     const perPage = 2;
     const result = await service.getActivities(token, perPage);
 
-    expect(fakeClient.lastToken).toBe(token);
-    expect(fakeClient.lastPerPage).toBe(perPage);
+    expect(StravaClient).toHaveBeenCalledWith(token);
+    expect(mockFetchActivities).toHaveBeenCalledWith(perPage);
     expect(result[0]).toHaveProperty('transformed', true);
   });
 
   it('test_getActivities_propagatesFetchError', async () => {
     const service = new StravaService();
-    (service as any).stravaClient = new FakeStravaClientError();
+    (StravaClient as unknown as any).mockImplementation(() => {
+      return {
+        fetchActivities: vi.fn().mockRejectedValue(new Error('fetch failed')),
+      };
+    });
 
     await expect(service.getActivities('token', 5)).rejects.toThrow('fetch failed');
   });

@@ -35,15 +35,6 @@ export class AIService {
     }
   }
 
-  /**
-   * Generates content based on a prompt using an AI model.
-   * @param prompt The prompt string to send to the AI model.
-   * @returns A promise that resolves to the generated content as a string.
-   */
-  async generateContent(prompt: string): Promise<string> {
-    return this.geminiClient.generateContent(prompt);
-  }
-
   public generateCommentForActivity(activity: StravaActivity): string {
     const distanceKm = activity.distance ? activity.distance / 1000 : 0;
     const durationMinutes = activity.moving_time ? activity.moving_time / 60 : 0;

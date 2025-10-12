@@ -2,7 +2,7 @@ import { Activity } from '../types/Activity';
 import { ActivityType } from '../types/activityType';
 
 export const WELCOME_SUGGESTION: Activity = {
-  id: 'suggestion-0',
+  id: 0,
   name: "Welcome to Agon!",
   date: new Date().toISOString(),
   distance: 5,
@@ -13,7 +13,7 @@ export const WELCOME_SUGGESTION: Activity = {
 };
 
 export const FALLBACK_SUGGESTION: Activity = {
-  id: 'suggestion-fallback',
+  id: 1,
   name: "Easy Recovery Run",
   date: new Date().toISOString(),
   distance: 3,
@@ -37,7 +37,7 @@ export const getSuggestionPrompt = (activities: Activity[], date: string) => `
 
       Based on this data, generate a response in a valid JSON format with the following structure:
       {
-        "id": "suggestion-1",
+        "id": 123,
         "name": "A short, catchy name for the suggested activity (e.g., 'Tempo Run')",
         "date": "${date}",
         "distance": "A suggested distance in kilometers (number).",
@@ -51,8 +51,8 @@ export const getSuggestionPrompt = (activities: Activity[], date: string) => `
     `;
 
 export const getBatchCommentsPrompt = (activitiesForPrompt: Activity[]) => `
-      As a friendly and encouraging fitness coach, analyze the following activities and for each one, provide a one-sentence, insightful comment.
-      Focus on a positive aspect or offer a small piece of encouragement.
+      As an expert fitness analyst, review the following activities. For each one, provide a concise, one-sentence analytical comment highlighting a key performance metric (like pace, elevation, or heart rate consistency).
+      Avoid generic encouragement.
 
       Activities Data (JSON format):
       ${JSON.stringify(activitiesForPrompt, null, 2)}
