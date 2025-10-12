@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from "../services/authService";
 import createError from 'http-errors';
+import crypto from 'crypto';
 
 export class AuthController {
   private authService: AuthService;
@@ -15,8 +16,9 @@ export class AuthController {
    */
     redirectToStrava = (req: Request, res: Response, next: NextFunction) => {
         try {
-            const authorizationUrl = this.authService.getAuthorizationUrl();
-            console.log("Redirecting to Strava authorization URL:", authorizationUrl);
+            const state = crypto.randomBytes(16).toString('hex');
+            res.cookie('strava_oauth_state', state, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 300000 }); // 5 minutes
+            const authorizationUrl = this.authService.getAuthorizationUrl(state);
             res.redirect(authorizationUrl); // Redirect the user to Strava's authorization page
         } catch (error) {
             next(error);
@@ -28,10 +30,17 @@ export class AuthController {
      * Handles the OAuth2 callback from Strava.
      */
     handleStravaCallback = async (req: Request, res: Response, next: NextFunction) => {
-        const { code } = req.query;
+        const { code, state } = req.query;
+        const storedState = req.cookies.strava_oauth_state;
+
+        if (!state || state !== storedState) {
+            return next(createError(400, "Invalid state parameter. Possible CSRF attack."));
+        }
+
+        res.clearCookie('strava_oauth_state');
 
         if (!code) {
-            throw createError(400, "Authorization code is missing");
+            return next(createError(400, "Authorization code is missing"));
         }
 
         try {

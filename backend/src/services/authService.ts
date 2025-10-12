@@ -8,16 +8,18 @@ const STRAVA_AUTH_BASE = "https://www.strava.com/oauth";
 
 export class AuthService {
 
-  getAuthorizationUrl = (): string => {
+  getAuthorizationUrl = (state: string): string => {
     const CLIENT_ID = process.env.STRAVA_CLIENT_ID;
     if (!CLIENT_ID) {
       throw new Error("STRAVA_CLIENT_ID is not set in environment variables.");
     }
     const PORT = process.env.PORT || 4000;
+    const REDIRECT_URI_BASE = process.env.BACKEND_URL || `http://localhost:${PORT}`;
     const params = new URLSearchParams({
         client_id: CLIENT_ID,
         response_type: "code",
-        redirect_uri: `http://localhost:${PORT}/api/strava/auth/callback`,
+        redirect_uri: `${REDIRECT_URI_BASE}/api/strava/auth/callback`,
+        state: state,
         scope: "read,activity:read_all",
         approval_prompt: "auto",
     });
