@@ -1,4 +1,4 @@
-import { ActivityType } from './activityType';
+import { ActivityType } from './ActivityType';
 export interface Activity {
   id: number;
   name: string;

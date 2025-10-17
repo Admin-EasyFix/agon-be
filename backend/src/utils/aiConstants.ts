@@ -1,5 +1,5 @@
 import { Activity } from '../types/Activity';
-import { ActivityType } from '../types/activityType';
+import { ActivityType } from '../types/ActivityType';
 
 export const WELCOME_SUGGESTION: Activity = {
   id: 0,
