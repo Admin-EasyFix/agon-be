@@ -1,4 +1,4 @@
-export type Athlete =  {
+export type StravaAthlete =  {
     id: number;
     username: string;
     resource_state: number;
