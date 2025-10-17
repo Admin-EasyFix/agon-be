@@ -1,0 +1,45 @@
+@startuml
+title Agon – Sequence Diagram
+
+actor User
+participant "Frontend (React)" as FE
+participant "Backend (API Server)" as BE
+participant "Strava OAuth" as Strava
+participant "AI Engine" as AI
+
+== User Authentication ==
+User -> FE : Click "Connect with Strava"
+FE -> BE : GET /api/strava/auth
+BE -> Strava : Redirect to OAuth (client_id, redirect_uri)
+Strava -> User : Prompt for permission
+User -> Strava : Authorize app
+Strava -> BE : Redirect with ?code=AUTH_CODE
+BE -> Strava : POST /oauth/token (client_id, client_secret, code)
+Strava -> BE : Return access_token
+BE -> FE : Redirect to /dashboard?token=ACCESS_TOKEN
+
+== Fetch User Data ==
+FE -> BE : GET /api/strava/profile?token=ACCESS_TOKEN
+BE -> Strava : GET /api/v3/athlete (Bearer ACCESS_TOKEN)
+Strava -> BE : Return athlete profile
+BE -> FE : Return user profile JSON
+
+== Fetch Activities ==
+FE -> BE : GET /api/strava/activities?token=ACCESS_TOKEN
+BE -> Strava : GET /api/v3/athlete/activities (Bearer ACCESS_TOKEN)
+Strava -> BE : Return last N activities
+BE -> FE : Return normalized activity JSON
+
+== AI Suggestion ==
+FE -> BE : GET /api/suggest?token=ACCESS_TOKEN
+BE -> Strava : (optional) Fetch recent activities
+BE -> AI : Analyze activities and generate suggestion
+AI -> BE : Return suggestion + reason
+BE -> FE : Return JSON {suggestion, reason}
+
+== (Optional) Feedback ==
+FE -> BE : POST /api/feedback {suggestion_id, useful}
+BE -> DB: (Store feedback)
+
+@enduml
+

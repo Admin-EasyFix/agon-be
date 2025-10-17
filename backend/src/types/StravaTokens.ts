@@ -1,0 +1,9 @@
+import { Athlete } from "./StravaAthlete";
+export type StravaTokens = {
+    token_type: string;
+    expires_at: number;
+    expires_in: number;
+    refresh_token: string;
+    access_token: string;
+    athlete: Athlete;
+};

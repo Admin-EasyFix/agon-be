@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: Agon Backend API
+  description: API for the Agon fitness dashboard, providing access to Strava data, AI-powered suggestions, and analytics.
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+
+paths:
+  /:
+    get:
+      summary: Health Check
+      description: Checks if the API is running and returns a welcome message.
+      tags:
+        - General
+      responses:
+        '200':
+          description: API is up and running.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Welcome to the API!"
+
+  /api/strava/activities:
+    get:
+      summary: Get User Activities
+      description: Fetches a list of the authenticated user's most recent activities from Strava.
+      tags: 
+        - Activities
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of user activities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+        '401':
+          description: Unauthorized. The Bearer token is missing, invalid, or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/suggest:
+    get:
+      summary: Get Activity Suggestion
+      description: Generates an AI-powered suggestion for the user's next activity based on their recent training history.
+      tags:   
+        - Activities
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A suggested activity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          description: Unauthorized. The Bearer token is missing, invalid, or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/strava/auth:
+    get:
+      summary: Authenticate with Strava
+      description: Redirects the user to Strava's authorization page to grant permission to the application.
+      tags:
+        - Auth
+      responses:
+        '302':
+          description: Redirect to Strava's authorization page.
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/strava/auth/callback:
+    get:
+      summary: Strava Authorization Callback
+      description: Handles the callback from Strava after the user has authorized the application. The authorization code is exchanged for an access token.
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Successfully authenticated. Returns user information and tokens.
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # Or Opaque, depending on the token type
+      description: "User's Strava access token."
+
+  schemas:
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the activity.
+        name:
+          type: string
+          description: The name of the activity.
+        date:
+          type: string
+          format: date-time
+          description: The start date and time of the activity in ISO 8601 format.
+        distance:
+          type: number
+          format: float
+          description: The distance of the activity in kilometers.
+        pace:
+          type: string
+          description: The average pace of the activity (e.g., 'min:ss/km').
+        duration:
+          type: number
+          description: The duration of the activity in minutes.
+        description:
+          type: string
+          description: An AI-generated or fallback comment about the activity.
+        elevation:
+          type: number
+          description: Total elevation gain in meters.
+        heartRate:
+          type: number
+          description: Average heart rate in beats per minute.
+        type:
+          $ref: '#/components/schemas/ActivityType'
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code.
+          example: 401
+        message:
+          type: string
+          description: A human-readable error message.
+          example: "Unauthorized: Invalid or expired Strava token."
+    ActivityType:
+      type: string
+      enum:
+        - running
+        - cycling
+        - swimming
+        - hiking
+        - other
+      description: The type of the activity.
