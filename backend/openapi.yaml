@@ -81,6 +81,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/strava/auth:
+    get:
+      summary: Authenticate with Strava
+      description: Redirects the user to Strava's authorization page to grant permission to the application.
+      tags:
+        - Auth
+      responses:
+        '302':
+          description: Redirect to Strava's authorization page.
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/strava/auth/callback:
+    get:
+      summary: Strava Authorization Callback
+      description: Handles the callback from Strava after the user has authorized the application. The authorization code is exchanged for an access token.
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Successfully authenticated. Returns user information and tokens.
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   securitySchemes:
     BearerAuth:

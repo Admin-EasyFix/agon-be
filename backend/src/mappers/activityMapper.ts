@@ -1,7 +1,7 @@
 import { Activity } from '../types/Activity';
 import { StravaActivity } from '../types/StravaActivity';
 import { AIService } from '../services/aiService';
-import { ActivityType } from '../types/activityType';
+import { ActivityType } from '../types/ActivityType';
 
 export class ActivityMapper {
   private aiService: AIService;
