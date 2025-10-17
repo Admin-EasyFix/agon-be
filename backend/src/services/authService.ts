@@ -4,41 +4,41 @@ import { StravaTokens } from '../types/StravaTokens';
 
 dotenv.config();
 
-const STRAVA_AUTH_BASE = "https://www.strava.com/oauth";
-
 export class AuthService {
+  private redirectUri: string;
+  private clientId: string | undefined;
+  private clientSecret: string | undefined;
+  private static readonly stravaAuthBase = "https://www.strava.com/oauth";
+
+  constructor() {
+    if (!process.env.STRAVA_CLIENT_ID || !process.env.STRAVA_CLIENT_SECRET) {
+      throw new Error("STRAVA_CLIENT_ID or STRAVA_CLIENT_SECRET is not set in env.");
+    }
+    this.clientId = process.env.STRAVA_CLIENT_ID;
+    this.clientSecret = process.env.STRAVA_CLIENT_SECRET;
+
+    const PORT = process.env.PORT || 4000;
+    const BASE_URL = process.env.BACKEND_URL || `http://localhost:${PORT}`;
+    this.redirectUri = `${BASE_URL}/api/strava/auth/callback`;
+  }
 
   getAuthorizationUrl = (state: string): string => {
-    const CLIENT_ID = process.env.STRAVA_CLIENT_ID;
-    if (!CLIENT_ID) {
-      throw new Error("STRAVA_CLIENT_ID is not set in environment variables.");
-    }
-    const PORT = process.env.PORT || 4000;
-    const REDIRECT_URI_BASE = process.env.BACKEND_URL || `http://localhost:${PORT}`;
     const params = new URLSearchParams({
-        client_id: CLIENT_ID,
+        client_id: this.clientId!,
         response_type: "code",
-        redirect_uri: `${REDIRECT_URI_BASE}/api/strava/auth/callback`,
+        redirect_uri: this.redirectUri,
         state: state,
         scope: "read,activity:read_all",
         approval_prompt: "auto",
     });
 
-    return `${STRAVA_AUTH_BASE}/authorize?${params.toString()}`;
+    return `${AuthService.stravaAuthBase}/authorize?${params.toString()}`;
   };
 
   exchangeCodeForToken = async (code: string): Promise<StravaTokens> => {
-    const CLIENT_ID = process.env.STRAVA_CLIENT_ID;
-    if (!CLIENT_ID) {
-      throw new Error("STRAVA_CLIENT_ID is not set in environment variables.");
-    }
-    const CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
-    if (!CLIENT_SECRET) {
-      throw new Error("STRAVA_CLIENT_SECRET is not set in environment variables.");
-    }
-    const response = await axios.post(`${STRAVA_AUTH_BASE}/token`, {
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
+    const response = await axios.post(`${AuthService.stravaAuthBase}/token`, {
+        client_id: this.clientId,
+        client_secret: this.clientSecret,
         code: code,
         grant_type: "authorization_code",
     });

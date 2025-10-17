@@ -1,13 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from "../services/authService";
+import jwt from 'jsonwebtoken';
 import createError from 'http-errors';
 import crypto from 'crypto';
 
 export class AuthController {
   private authService: AuthService;
+  private readonly stateSecret: string | undefined;
+
 
   constructor() {
+    if (!process.env.STATE_SECRET) {
+      throw new Error("STATE_SECRET is not set in env.");
+    }
     this.authService = new AuthService();
+    this.stateSecret = process.env.STATE_SECRET;
   }
 
   /**
@@ -16,10 +23,10 @@ export class AuthController {
    */
     redirectToStrava = (req: Request, res: Response, next: NextFunction) => {
         try {
-            const state = crypto.randomBytes(16).toString('hex');
-            res.cookie('strava_oauth_state', state, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 300000 }); // 5 minutes
+            const nonce = crypto.randomBytes(8).toString('hex');
+            const state = jwt.sign({ nonce }, this.stateSecret!, { expiresIn: '5m' });
             const authorizationUrl = this.authService.getAuthorizationUrl(state);
-            res.redirect(authorizationUrl); // Redirect the user to Strava's authorization page
+            res.redirect(authorizationUrl);
         } catch (error) {
             next(error);
         }
@@ -30,24 +37,21 @@ export class AuthController {
      * Handles the OAuth2 callback from Strava.
      */
     handleStravaCallback = async (req: Request, res: Response, next: NextFunction) => {
-        const { code, state } = req.query;
-        const storedState = req.cookies.strava_oauth_state;
+      const { code, state } = req.query;
 
-        if (!state || state !== storedState) {
-            return next(createError(400, "Invalid state parameter. Possible CSRF attack."));
+      if (!code || !state) {
+        return next(createError(400, 'Missing code or state'));
+      }
+
+      try {
+        jwt.verify(state as string, this.stateSecret!);
+        const tokens = await this.authService.exchangeCodeForToken(code as string);
+        res.status(200).json(tokens);
+      } catch (error: any) {
+        if (error.name === 'TokenExpiredError') {
+          return next(createError(400, 'OAuth state expired, please retry login.'));
         }
-
-        res.clearCookie('strava_oauth_state');
-
-        if (!code) {
-            return next(createError(400, "Authorization code is missing"));
-        }
-
-        try {
-            const token = await this.authService.exchangeCodeForToken(code as string);
-            res.status(200).json(token);
-        } catch (error) {
-            next(error);
-        }
+        next(error);
+      }
     };
 };
