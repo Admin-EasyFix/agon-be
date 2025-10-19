@@ -82,13 +82,9 @@ export class AuthService {
   deauthorize = async (accessToken: string): Promise<void> => {
     try {
       console.log("🚫 Revoking Strava token...");
-      await axios.post(
-        `${AuthService.stravaAuthBase}/deauthorize`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
+      await axios.post(`${AuthService.stravaAuthBase}/deauthorize`, {
+        access_token: accessToken,
+      });
       console.log("✅ Strava token revoked successfully.");
     } catch (error: any) {
       console.error("❌ Failed to revoke Strava token:", error.response?.data || error.message);
