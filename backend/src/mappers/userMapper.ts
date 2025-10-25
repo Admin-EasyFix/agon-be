@@ -1,10 +1,9 @@
 import { StravaAthlete } from '../types/strava/StravaAthlete';
-import { CreateUserDBO } from '../types/domain/CreateUserDBO';
-import { UpdateUserDBO } from '../types/domain/UpdateUserDBO';
 import { StravaTokens } from '../types/strava/StravaTokens';
+import { UserDbo } from '../types/domain/UserDBO';
 
 export const UserMapper = {
-  toCreateDBO(athleteData: StravaAthlete, tokenData: StravaTokens): CreateUserDBO {
+  toDbo(athleteData: StravaAthlete, tokenData: StravaTokens): UserDbo {
     const tokenExpiresAt = new Date(tokenData.expires_at * 1000);
     return {
       stravaId: athleteData.id,
@@ -13,11 +12,10 @@ export const UserMapper = {
       profilePicture: athleteData.profile,
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,
-      tokenExpiresAt,
+      tokenExpiresAt: new Date(tokenData.expires_at * 1000),
     };
   },
-
-  toUpdateDBO(tokenData: StravaTokens): UpdateUserDBO {
+  toUpdateDbo(tokenData: StravaTokens): Omit<UserDbo, 'stravaId'> {
     return {
       accessToken: tokenData.access_token,
       refreshToken: tokenData.refresh_token,

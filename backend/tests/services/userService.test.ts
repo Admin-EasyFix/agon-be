@@ -1,27 +1,34 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UserService } from '../../src/services/userService';
-import prisma from '../../src/prisma/client';
 import { StravaAthlete } from '../../src/types/strava/StravaAthlete';
+import { UserRepository } from '../../src/repositories/userRepository';
+import { UserMapper } from '../../src/mappers/userMapper';
+import { UserDbo } from '../../src/types/domain/UserDBO';
 
-vi.mock('../../src/prisma/client', () => ({
-  default: {
-    user: {
-      upsert: vi.fn(),
-    },
-  },
-}));
+// Mock dependencies
+vi.mock('../../src/repositories/userRepository');
+vi.mock('../../src/mappers/userMapper');
 
 describe('UserService', () => {
-  it('should call prisma.user.upsert with correct arguments', async () => {
-    const userService = new UserService();
+  let userService: UserService;
+  let mockUserRepository: UserRepository;
 
+  beforeEach(() => {
+    // Create new instances for each test to ensure isolation
+    mockUserRepository = new UserRepository();
+    userService = new UserService(mockUserRepository);
+    vi.clearAllMocks();
+  });
+
+  it('should map strava data to a DBO and call the repository to upsert the user', async () => {
+    // Arrange
     const athleteData: StravaAthlete = {
       id: 12345,
-      username: "testuser",
+      username: 'testuser',
       resource_state: 2,
       firstname: 'Test',
       lastname: 'User',
-      bio: "I run sometimes",
+      bio: 'I run sometimes',
       city: 'Testville',
       state: 'TS',
       country: 'Testland',
@@ -32,10 +39,10 @@ describe('UserService', () => {
       updated_at: new Date().toISOString(),
       badge_type_id: 0,
       weight: 75,
-      profile_medium: "http://example.com/profile_medium.jpg",
+      profile_medium: 'http://example.com/profile_medium.jpg',
       profile: 'http://example.com/profile.jpg',
-      friend: "null",
-      follower: "null",
+      friend: 'null',
+      follower: 'null',
     };
 
     const tokenData = {
@@ -47,8 +54,7 @@ describe('UserService', () => {
       athlete: athleteData,
     };
 
-    const expectedUserData = {
-      id: 1,
+    const userDbo: UserDbo = {
       stravaId: 12345,
       firstname: 'Test',
       lastname: 'User',
@@ -56,32 +62,31 @@ describe('UserService', () => {
       accessToken: 'test_access_token',
       refreshToken: 'test_refresh_token',
       tokenExpiresAt: new Date('2023-01-01T00:00:00.000Z'),
+    };
+
+    const expectedUserResult = {
+      ...userDbo,
+      id: 1,
+      tokenExpiresAt: new Date('2023-01-01T00:00:00.000Z'),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
-    (prisma.user.upsert as ReturnType<typeof vi.fn>).mockResolvedValue(expectedUserData);
-
+    // Mock the mapper and repository responses
+    // Mock the mapper and repository responses
+    vi.spyOn(UserMapper, 'toDbo').mockReturnValue(userDbo);
+    vi.spyOn(mockUserRepository, 'upsert').mockResolvedValue(expectedUserResult as any);
+    // Act
     const result = await userService.upsertUserFromStrava(athleteData, tokenData);
 
-    expect(prisma.user.upsert).toHaveBeenCalledWith({
-      where: { stravaId: athleteData.id },
-      update: {
-        accessToken: tokenData.access_token,
-        refreshToken: tokenData.refresh_token,
-        tokenExpiresAt: new Date(tokenData.expires_at * 1000),
-      },
-      create: {
-        stravaId: athleteData.id,
-        firstname: athleteData.firstname,
-        lastname: athleteData.lastname,
-        profilePicture: athleteData.profile,
-        accessToken: tokenData.access_token,
-        refreshToken: tokenData.refresh_token,
-        tokenExpiresAt: new Date(tokenData.expires_at * 1000),
-      },
-    });
+    // Assert
+    // 1. Check that the mapper was called correctly
+    expect(UserMapper.toDbo).toHaveBeenCalledWith(athleteData, tokenData);
 
-    expect(result).toEqual(expectedUserData);
+    // 2. Check that the repository was called with the result from the mapper
+    expect(mockUserRepository.upsert).toHaveBeenCalledWith(userDbo);
+
+    // 3. Check that the service returns the result from the repository
+    expect(result).toEqual(expectedUserResult);
   });
 });
