@@ -1,4 +1,4 @@
-import { StravaActivity } from '../types/StravaActivity';
+import { StravaActivity } from '../types/strava/StravaActivity';
 import createError from 'http-errors';
 
 const STRAVA_API_BASE = 'https://www.strava.com/api/v3';
