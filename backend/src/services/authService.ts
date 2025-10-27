@@ -1,6 +1,6 @@
 import axios from "axios";
 import dotenv from 'dotenv';
-import { StravaTokens } from '../types/StravaTokens';
+import { StravaTokens } from '../types/strava/StravaTokens';
 
 dotenv.config();
 
