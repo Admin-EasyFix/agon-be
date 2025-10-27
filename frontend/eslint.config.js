@@ -2,18 +2,13 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import tseslint from 'typescript-eslint'
-import { FlatCompat } from '@eslint/eslintrc'
-
-const compat = new FlatCompat({ baseDirectory: __dirname })
 
 export default [
-  // Convert legacy/shareable configs (which may declare `plugins` as arrays)
-  // into the flat-config format using FlatCompat.
-  ...compat.extends(
-    js.configs.recommended,
-    ...tseslint.configs.recommended,
-    reactHooks.configs['recommended-latest']
-  ),
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  // reactHooks.configs['recommended-latest'] is a single config object, not an iterable.
+  // It should be included directly without the spread operator.
+  reactHooks.configs['recommended-latest'],
   // Project-specific overrides
   {
     ignores: ['dist'],
