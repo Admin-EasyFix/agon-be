@@ -1,5 +1,5 @@
 import { Activity } from '../types/Activity';
-import { StravaActivity } from '../types/StravaActivity';
+import { StravaActivity } from '../types/strava/StravaActivity';
 import { AIService } from '../services/aiService';
 import { ActivityType } from '../types/ActivityType';
 
