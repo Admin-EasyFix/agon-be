@@ -6,15 +6,15 @@ import crypto from 'crypto';
 
 export class AuthController {
   private authService: AuthService;
-  private readonly stateSecret: string | undefined;
+  private readonly jwtSecret: string | undefined;
 
 
   constructor() {
-    if (!process.env.STATE_SECRET) {
-      throw new Error("STATE_SECRET is not set in env.");
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not set in env.");
     }
     this.authService = new AuthService();
-    this.stateSecret = process.env.STATE_SECRET;
+    this.jwtSecret = process.env.JWT_SECRET;
   }
 
   /**
@@ -24,7 +24,7 @@ export class AuthController {
     redirectToStrava = (req: Request, res: Response, next: NextFunction) => {
         try {
             const nonce = crypto.randomBytes(8).toString('hex');
-            const state = jwt.sign({ nonce }, this.stateSecret!, { expiresIn: '5m' });
+            const state = jwt.sign({ nonce }, this.jwtSecret!, { expiresIn: '5m' });
             const authorizationUrl = this.authService.getAuthorizationUrl(state);
             res.redirect(authorizationUrl);
         } catch (error) {
@@ -44,7 +44,7 @@ export class AuthController {
       }
 
       try {
-        jwt.verify(state as string, this.stateSecret!);
+        jwt.verify(state as string, this.jwtSecret!);
         const tokens = await this.authService.exchangeCodeForToken(code as string);
         res.status(200).json(tokens);
       } catch (error: any) {
