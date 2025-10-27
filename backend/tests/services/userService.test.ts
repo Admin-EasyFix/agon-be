@@ -74,14 +74,14 @@ describe('UserService', () => {
 
     // Mock the mapper and repository responses
     // Mock the mapper and repository responses
-    vi.spyOn(UserMapper, 'toDbo').mockReturnValue(userDbo);
+    vi.spyOn(UserMapper, 'toUserDbo').mockReturnValue(userDbo);
     vi.spyOn(mockUserRepository, 'upsert').mockResolvedValue(expectedUserResult as any);
     // Act
     const result = await userService.upsertUserFromStrava(athleteData, tokenData);
 
     // Assert
     // 1. Check that the mapper was called correctly
-    expect(UserMapper.toDbo).toHaveBeenCalledWith(athleteData, tokenData);
+    expect(UserMapper.toUserDbo).toHaveBeenCalledWith(athleteData, tokenData);
 
     // 2. Check that the repository was called with the result from the mapper
     expect(mockUserRepository.upsert).toHaveBeenCalledWith(userDbo);

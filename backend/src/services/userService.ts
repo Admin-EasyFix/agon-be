@@ -12,7 +12,7 @@ export class UserService {
   }
 
   async upsertUserFromStrava(athleteData: StravaAthlete, tokenData: StravaTokens) {
-    const userDbo = UserMapper.toDbo(athleteData, tokenData);
+    const userDbo = UserMapper.toUserDbo(athleteData, tokenData);
     return this.userRepository.upsert(userDbo);
   }
 }

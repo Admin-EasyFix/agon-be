@@ -1,15 +1,13 @@
 import { User } from '@prisma/client';
 
 /**
- * A flexible Database Object for creating and updating users.
+ * A Database Object for creating or updating a user with a full set of data,
+ * typically after an OAuth flow.
  *
- * It requires `stravaId` for all operations but makes other fields optional,
- * suitable for both creation (where most fields are present) and partial updates.
+ * It makes database-generated fields optional but requires all fields
+ * that are expected from the identity provider.
  */
-export type UserDbo = Pick<User, 'stravaId'> &
-  Partial<
-    Omit<
-      User,
-      'id' | 'createdAt' | 'updatedAt' | 'stravaId'
-    >
-  >;
+export type UserDbo = Omit<
+  User,
+  'id' | 'createdAt' | 'updatedAt'
+>;

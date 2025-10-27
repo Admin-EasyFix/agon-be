@@ -8,10 +8,7 @@ export class UserRepository {
     return prisma.user.upsert({
       where: { stravaId },
       create: {
-        // The DBO is flexible, but for creation, we expect all fields.
-        // Casting to `any` here is a pragmatic way to handle the mismatch
-        // between the flexible DBO and the strict `create` input type.
-        ...(dbo as any),
+        ...dbo,
       },
       update: {
         ...updateData,
