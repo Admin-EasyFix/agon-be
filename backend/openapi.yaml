@@ -125,13 +125,8 @@ paths:
       description: Fetches the authenticated user's profile information using an access token.
       tags:
         - User
-      parameters:
-        - in: query
-          name: token
-          schema:
-            type: string
-          required: true
-          description: The user's access token (JWT).
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: User profile information.

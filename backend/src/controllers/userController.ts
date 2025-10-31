@@ -18,7 +18,7 @@ export class UserController {
    */
   async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const token = this._getValidatedTokenFromQuery(req);
+      const token = this._getValidatedToken(req);
       const userProfile = await this.userService.getUserProfile(token);
       res.json(userProfile);
     } catch (error) {
@@ -26,11 +26,12 @@ export class UserController {
     }
   }
 
-  private _getValidatedTokenFromQuery(req: Request): string {
-    const token = req.query.token as string;
+  private _getValidatedToken(req: Request): string {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
 
     if (!token) {
-      throw createError(Unauthorized, 'Access token is required');
+      throw createError(Unauthorized, 'Bearer token is required');
     }
 
     return token;
