@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import createError from 'http-errors';
 import crypto from 'crypto';
 import { UserService } from '../services/userService';
+import { extractStravaAccessToken, extractUserIdFromRequest } from '../utils/auth';
 
 export class AuthController {
   private authService: AuthService;
@@ -81,6 +82,22 @@ export class AuthController {
         if (error.name === 'TokenExpiredError') {
           return next(createError(400, 'OAuth state expired, please retry login.'));
         }
+        next(error);
+      }
+    };
+
+    /**
+     * POST /api/strava/auth/deauthorize
+     * Deauthorize user.
+     */
+    deauthorizeUser = async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const token = await extractStravaAccessToken(req);
+        this.authService.deauthorize(token);
+        const userId = await extractUserIdFromRequest(req);
+        this.userService.deleteUserById(userId);
+        res.status(204).send();
+      } catch (error: any) {
         next(error);
       }
     };

@@ -14,6 +14,7 @@ export function setRoutes(app: Application) {
     // Auth endpoints
     app.get('/api/strava/auth/authorize', authController.redirectToStrava.bind(authController));
     app.get('/api/strava/auth/callback', authController.handleStravaCallback.bind(authController));
+    app.post('/api/strava/auth/deauthorize', authController.deauthorizeUser.bind(authController));
 
     // Strava API endpoints
     app.get('/api/strava/activities', stravaController.getActivities.bind(stravaController));

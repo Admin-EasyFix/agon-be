@@ -21,6 +21,12 @@ export class UserRepository {
       where: { id }
     });
   }
+
+  async delete(id: number): Promise<void> {
+    await prisma.user.delete({
+      where: { id }
+    });
+  }
 }
 
 export const userRepository = new UserRepository();

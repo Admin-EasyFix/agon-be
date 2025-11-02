@@ -18,4 +18,8 @@ export class UserService {
     const userDbo = await this.userRepository.get(userId);
     return userDbo ? UserMapper.toStravaTokens(userDbo) : null;
   }
+
+  async deleteUserById(userId: number): Promise<void> {
+    await this.userRepository.delete(userId);
+  }
 }
