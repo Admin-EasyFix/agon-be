@@ -25,15 +25,27 @@ export class AuthController {
    */
     redirectToStrava = (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { redirect_uri } = req.query;
-            if (!redirect_uri) {
-                throw createError(400, 'Missing redirect_uri');
-            }
+          const { redirect_uri } = req.query;
+          if (!redirect_uri) {
+            throw createError(400, 'Missing redirect_uri');
+          }
 
-            const nonce = crypto.randomBytes(8).toString('hex');
-            const state = jwt.sign({ nonce, redirect_uri }, this.jwtSecret!, { expiresIn: '5m' });
-            const authorizationUrl = this.authService.getAuthorizationUrl(state);
-            res.redirect(authorizationUrl);
+          const allowedRedirects = (process.env.ALLOWED_REDIRECT_URIS || '')
+            .split(',')
+            .map(u => u.trim())
+            .filter(Boolean);
+
+          const isAllowed = allowedRedirects.length > 0
+          ? allowedRedirects.includes(String(redirect_uri)) : false;
+
+          if (!isAllowed) {
+            throw createError(400, 'Invalid redirect_uri');
+          }
+
+          const nonce = crypto.randomBytes(8).toString('hex');
+          const state = jwt.sign({ nonce, redirect_uri }, this.jwtSecret!, { expiresIn: '5m' });
+          const authorizationUrl = this.authService.getAuthorizationUrl(state);
+          res.redirect(authorizationUrl);
         } catch (error) {
             next(error);
         }
@@ -52,10 +64,19 @@ export class AuthController {
 
       try {
         const decodedState = jwt.verify(state as string, this.jwtSecret!) as { nonce: string; redirect_uri: string };
+        const allowedRedirects = (process.env.ALLOWED_REDIRECT_URIS || '')
+          .split(',')
+          .map(u => u.trim())
+          .filter(Boolean);
+
+        if (!allowedRedirects.includes(decodedState.redirect_uri)) {
+          return next(createError(400, 'Invalid redirect_uri in state'));
+        }
         const tokens = await this.authService.exchangeCodeForToken(code as string);
         const user = await this.userService.upsertUserFromStrava(tokens);
         const token = jwt.sign({ id: user.id }, this.jwtSecret!, { expiresIn: '7d' });
-        res.redirect(`${decodedState.redirect_uri}#token=${token}`);
+        const redirectUrl = `${decodedState.redirect_uri}#token=${encodeURIComponent(token)}`;
+        res.redirect(redirectUrl);
       } catch (error: any) {
         if (error.name === 'TokenExpiredError') {
           return next(createError(400, 'OAuth state expired, please retry login.'));
