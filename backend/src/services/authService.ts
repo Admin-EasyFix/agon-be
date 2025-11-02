@@ -51,7 +51,19 @@ export class AuthService {
     });
 
     return response.data as StravaTokens;
-  };
+  };  
+
+  /**
+   * Validates Strava tokens. If expired, refreshes and returns new tokens.
+   * Throws Unauthorized if refresh fails.
+   */
+  async validateStravaTokens(tokens: StravaTokens): Promise<StravaTokens> {
+    const now = Math.floor(Date.now() / 1000);
+    if (tokens.expires_at > now) {
+      return tokens;
+    }
+    return this.refreshAccessToken(tokens.refresh_token);
+  }
 
   /**
    * Refreshes an expired access token using a refresh token.

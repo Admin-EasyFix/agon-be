@@ -15,6 +15,12 @@ export class UserRepository {
       },
     });
   }
+
+  async get(id: number): Promise<UserDbo | null> {
+    return prisma.user.findUnique({
+      where: { id }
+    });
+  }
 }
 
 export const userRepository = new UserRepository();
