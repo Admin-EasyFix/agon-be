@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { StravaService } from '../services/stravaService';
 import createError from 'http-errors';
 import { AIService } from '../services/aiService';
+import { HttpStatusCode } from 'axios';
+
+const { Unauthorized } = HttpStatusCode;
 
 export class StravaController {
   private stravaService: StravaService;
@@ -18,13 +21,7 @@ export class StravaController {
    */
   async getActivities(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const authHeader = req.headers.authorization;
-      const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-  
-      if (!token) {
-        throw createError(401, 'Bearer token is required');
-      }
-  
+      const token = this._getValidatedToken(req);
       const activities = await this.stravaService.getActivities(token, 10);
   
       res.json(activities);
@@ -39,13 +36,7 @@ export class StravaController {
    */
   async getSuggestion(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const authHeader = req.headers.authorization;
-      const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-  
-      if (!token) {
-        throw createError(401, 'Bearer token is required');
-      }
-  
+      const token = this._getValidatedToken(req);
       const activities = await this.stravaService.getActivities(token, 10);
   
       const recommendation = await this.aiService.suggestNextActivity(activities);
@@ -54,5 +45,16 @@ export class StravaController {
     } catch (error) {
       next(error);
     }
+  }
+
+  private _getValidatedToken(req: Request): string {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+    if (!token) {
+      throw createError(Unauthorized, 'Bearer token is required');
+    }
+
+    return token;
   }
 }

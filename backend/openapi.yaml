@@ -6,6 +6,12 @@ info:
 servers:
   - url: http://localhost:4000
     description: Local development server
+tags:
+  - name: General
+  - name: Auth
+  - name: Activities
+  - name: User
+    description: User-related endpoints
 
 paths:
   /:
@@ -112,6 +118,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  
+  /api/users/profile:
+    get:
+      summary: Get User Profile
+      description: Fetches the authenticated user's profile information using an access token.
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Unauthorized. The token is missing, invalid, or expired.
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   securitySchemes:
@@ -156,6 +186,21 @@ components:
           description: Average heart rate in beats per minute.
         type:
           $ref: '#/components/schemas/ActivityType'
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The user's unique identifier in the database.
+        firstname:
+          type: string
+          description: The user's first name.
+        lastname:
+          type: string
+          description: The user's last name.
+        profilePicture:
+          type: string
+          description: URL to the user's profile picture.
     Error:
       type: object
       properties:
