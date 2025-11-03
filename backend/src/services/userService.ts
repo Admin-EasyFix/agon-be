@@ -37,8 +37,12 @@ export class UserService {
   }
 
   private _decodeJwt(token: string): JwtPayload {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET is not defined in environment variables.');
+    }
     try {
-      return jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+      return jwt.verify(token, secret) as JwtPayload;
     } catch (error) {
       throw createError(Unauthorized, 'Invalid or expired token');
     }

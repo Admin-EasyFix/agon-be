@@ -35,6 +35,8 @@ describe('UserService', () => {
     vi.clearAllMocks();
     mockUserRepository = new UserRepository();
     userService = new UserService(mockUserRepository);
+    // Set a mock JWT secret for the test environment
+    process.env.JWT_SECRET = 'test-secret';
   });
 
   describe('upsertUserFromStrava', () => {
@@ -122,7 +124,7 @@ describe('UserService', () => {
       const result = await userService.getUserProfile(token);
 
       // Assert
-      expect(jwt.verify).toHaveBeenCalledWith(token, process.env.JWT_SECRET!);
+      expect(jwt.verify).toHaveBeenCalledWith(token, process.env.JWT_SECRET);
       expect(mockUserRepository.findByStravaId).toHaveBeenCalledWith(decodedPayload.stravaId);
       expect(result).toEqual(mockUser);
     });
@@ -150,7 +152,7 @@ describe('UserService', () => {
 
       // Act & Assert
       await expect(userService.getUserProfile(token)).rejects.toThrow('User not found');
-      expect(jwt.verify).toHaveBeenCalledWith(token, process.env.JWT_SECRET!);
+      expect(jwt.verify).toHaveBeenCalledWith(token, process.env.JWT_SECRET);
       expect(mockUserRepository.findByStravaId).toHaveBeenCalledWith(decodedPayload.stravaId);
     });
   });
