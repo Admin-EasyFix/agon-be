@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import createError from 'http-errors';
 import crypto from 'crypto';
 import { UserService } from '../services/userService';
-import { extractStravaAccessToken, extractUserIdFromRequest } from '../utils/auth';
+import { extractStravaAccessToken, extractUserIdFromRequest } from '../middleware/auth';
 import { HttpStatusCode } from 'axios';
 
 const { BadRequest } = HttpStatusCode;

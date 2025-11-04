@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../services/userService';
-import { extractUserIdFromRequest } from '../utils/auth';
+import { extractUserIdFromRequest } from '../middleware/auth';
 import { UserMapper } from '../mappers/userMapper';
 
 export class UserController {

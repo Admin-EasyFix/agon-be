@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { StravaService } from '../services/stravaService';
 import { AIService } from '../services/aiService';
-import { extractStravaAccessToken } from '../utils/auth';
+import { extractStravaAccessToken } from '../middleware/auth';
 
 export class StravaController {
   private stravaService: StravaService;
