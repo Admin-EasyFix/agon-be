@@ -65,7 +65,6 @@ export class StravaController {
    */
   async getActivities(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const token = this._getValidatedToken(req);
       const token = await this._extractStravaAccessToken(req);
       const activities = await this.stravaService.getActivities(token, 10);
   
@@ -81,7 +80,6 @@ export class StravaController {
    */
   async getSuggestion(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const token = this._getValidatedToken(req);
       const token = await this._extractStravaAccessToken(req);
       const activities = await this.stravaService.getActivities(token, 10);
   
@@ -91,16 +89,5 @@ export class StravaController {
     } catch (error) {
       next(error);
     }
-  }
-
-  private _getValidatedToken(req: Request): string {
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-
-    if (!token) {
-      throw createError(Unauthorized, 'Bearer token is required');
-    }
-
-    return token;
   }
 }
