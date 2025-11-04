@@ -17,7 +17,7 @@ export class UserRepository {
     });
   }
 
-  async get(id: number): Promise<UserDbo | null> {
+  async get(id: number): Promise<User | null> {
     return prisma.user.findUnique({
       where: { id }
     });
@@ -26,18 +26,6 @@ export class UserRepository {
   async delete(id: number): Promise<void> {
     await prisma.user.delete({
       where: { id }
-    });
-  }
-
-  async findByStravaId(stravaId: number): Promise<Partial<User> | null> {
-    return prisma.user.findUnique({
-      where: { stravaId },
-      select: {
-        id: true,
-        firstname: true,
-        lastname: true,
-        profilePicture: true,
-      },
     });
   }
 }

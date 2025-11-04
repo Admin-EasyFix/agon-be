@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import createError from 'http-errors';
 import { UserService } from '../services/userService';
-import { HttpStatusCode } from 'axios';
-
-const { Unauthorized } = HttpStatusCode;
+import { extractUserIdFromRequest } from '../utils/auth';
+import { UserMapper } from '../mappers/userMapper';
 
 export class UserController {
   private userService: UserService;
@@ -18,22 +16,11 @@ export class UserController {
    */
   async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const token = this._getValidatedToken(req);
-      const userProfile = await this.userService.getUserProfile(token);
-      res.json(userProfile);
+      const userId = await extractUserIdFromRequest(req);
+      const user = await this.userService.getUserById(userId);
+      res.json(UserMapper.toPartialUser(user));
     } catch (error) {
       next(error);
     }
-  }
-
-  private _getValidatedToken(req: Request): string {
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
-
-    if (!token) {
-      throw createError(Unauthorized, 'Bearer token is required');
-    }
-
-    return token;
   }
 }
