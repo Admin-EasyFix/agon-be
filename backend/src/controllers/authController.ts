@@ -3,33 +3,52 @@ import { AuthService } from "../services/authService";
 import jwt from 'jsonwebtoken';
 import createError from 'http-errors';
 import crypto from 'crypto';
+import { UserService } from '../services/userService';
 import { HttpStatusCode } from 'axios';
 
 const { BadRequest } = HttpStatusCode;
 
 export class AuthController {
   private authService: AuthService;
-  private readonly stateSecret: string | undefined;
-
+  private userService: UserService;
+  private readonly jwtSecret: string | undefined;
 
   constructor() {
-    if (!process.env.STATE_SECRET) {
-      throw new Error("STATE_SECRET is not set in env.");
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not set in env.");
     }
     this.authService = new AuthService();
-    this.stateSecret = process.env.STATE_SECRET;
+    this.userService = new UserService();
+    this.jwtSecret = process.env.JWT_SECRET;
   }
 
   /**
-   * GET /api/strava/auth
+   * GET /api/strava/auth/authorize
    * Redirects the user to Strava's OAuth2 authorization page.
    */
     redirectToStrava = (req: Request, res: Response, next: NextFunction) => {
         try {
-            const nonce = crypto.randomBytes(8).toString('hex');
-            const state = jwt.sign({ nonce }, this.stateSecret!, { expiresIn: '5m' });
-            const authorizationUrl = this.authService.getAuthorizationUrl(state);
-            res.redirect(authorizationUrl);
+          const { redirect_uri } = req.query;
+          if (!redirect_uri) {
+            throw createError(400, 'Missing redirect_uri');
+          }
+
+          const allowedRedirects = (process.env.ALLOWED_REDIRECT_URIS || '')
+            .split(',')
+            .map(u => u.trim())
+            .filter(Boolean);
+
+          const isAllowed = allowedRedirects.length > 0
+          ? allowedRedirects.includes(String(redirect_uri)) : false;
+
+          if (!isAllowed) {
+            throw createError(400, 'Invalid redirect_uri');
+          }
+
+          const nonce = crypto.randomBytes(8).toString('hex');
+          const state = jwt.sign({ nonce, redirect_uri }, this.jwtSecret!, { expiresIn: '5m' });
+          const authorizationUrl = this.authService.getAuthorizationUrl(state);
+          res.redirect(authorizationUrl);
         } catch (error) {
             next(error);
         }
@@ -47,9 +66,20 @@ export class AuthController {
       }
 
       try {
-        jwt.verify(state as string, this.stateSecret!);
+        const decodedState = jwt.verify(state as string, this.jwtSecret!) as { nonce: string; redirect_uri: string };
+        const allowedRedirects = (process.env.ALLOWED_REDIRECT_URIS || '')
+          .split(',')
+          .map(u => u.trim())
+          .filter(Boolean);
+
+        if (!allowedRedirects.includes(decodedState.redirect_uri)) {
+          return next(createError(400, 'Invalid redirect_uri in state'));
+        }
         const tokens = await this.authService.exchangeCodeForToken(code as string);
-        res.status(200).json(tokens);
+        const user = await this.userService.upsertUserFromStrava(tokens);
+        const token = jwt.sign({ id: user.id }, this.jwtSecret!, { expiresIn: '7d' });
+        const redirectUrl = `${decodedState.redirect_uri}#token=${encodeURIComponent(token)}`;
+        res.redirect(redirectUrl);
       } catch (error: any) {
         if (error.name === 'TokenExpiredError') {
           return next(createError(BadRequest, 'OAuth state expired, please retry login.'));

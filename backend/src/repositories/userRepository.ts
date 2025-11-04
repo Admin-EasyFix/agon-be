@@ -17,6 +17,12 @@ export class UserRepository {
     });
   }
 
+  async get(id: number): Promise<UserDbo | null> {
+    return prisma.user.findUnique({
+      where: { id }
+    });
+  }
+
   async findByStravaId(stravaId: number): Promise<Partial<User> | null> {
     return prisma.user.findUnique({
       where: { stravaId },

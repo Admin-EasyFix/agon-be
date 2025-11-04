@@ -1,4 +1,3 @@
-import { StravaAthlete } from '../types/strava/StravaAthlete';
 import { UserRepository, userRepository } from '../repositories/userRepository';
 import { UserMapper } from '../mappers/userMapper';
 import { StravaTokens } from '../types/strava/StravaTokens';
@@ -23,8 +22,8 @@ export class UserService {
     return await this._getExistingUserByStravaId(decodedPayload.stravaId);
   }
 
-  async upsertUserFromStrava(athleteData: StravaAthlete, tokenData: StravaTokens) {
-    const userDbo = UserMapper.toUserDbo(athleteData, tokenData);
+  async upsertUserFromStrava(tokens: StravaTokens) {
+    const userDbo = UserMapper.toUserDbo(tokens);
     return this.userRepository.upsert(userDbo);
   }
 
@@ -46,5 +45,10 @@ export class UserService {
     } catch (error) {
       throw createError(Unauthorized, 'Invalid or expired token');
     }
+  }
+
+  async getUserById(userId: number): Promise<StravaTokens | null> {
+    const userDbo = await this.userRepository.get(userId);
+    return userDbo ? UserMapper.toStravaTokens(userDbo) : null;
   }
 }

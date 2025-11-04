@@ -12,7 +12,7 @@ export function setRoutes(app: Application) {
     app.get('/', indexController.getIndex.bind(indexController));
     
     // Auth endpoints
-    app.get('/api/strava/auth', authController.redirectToStrava.bind(authController));
+    app.get('/api/strava/auth/authorize', authController.redirectToStrava.bind(authController));
     app.get('/api/strava/auth/callback', authController.handleStravaCallback.bind(authController));
 
     // Strava API endpoints
