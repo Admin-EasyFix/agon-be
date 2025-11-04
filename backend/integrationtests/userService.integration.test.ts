@@ -2,6 +2,7 @@ import { describe, it, expect, afterAll, afterEach } from 'vitest';
 import { UserService } from '../src/services/userService';
 import prisma from '../src/prisma/client';
 import { StravaAthlete } from '../src/types/strava/StravaAthlete';
+import jwt from 'jsonwebtoken';
 
 describe('UserService Integration Test', () => {
   const userService = new UserService();
@@ -48,44 +49,83 @@ describe('UserService Integration Test', () => {
     athlete: athleteData,
   };
 
-  it('should create a new user in the database if they do not exist', async () => {
-    // Act: Call the method to create the user.
-    await userService.upsertUserFromStrava(athleteData, tokenData);
-
-    // Assert: Verify the user was created in the database.
-    const userInDb = await prisma.user.findUnique({
-      where: { stravaId: athleteData.id },
+  describe('upsertUserFromStrava', () => {
+    it('should create a new user in the database if they do not exist', async () => {
+      // Act: Call the method to create the user.
+      await userService.upsertUserFromStrava(athleteData, tokenData);
+  
+      // Assert: Verify the user was created in the database.
+      const userInDb = await prisma.user.findUnique({
+        where: { stravaId: athleteData.id },
+      });
+  
+      expect(userInDb).not.toBeNull();
+      expect(userInDb?.stravaId).toBe(athleteData.id);
+      expect(userInDb?.firstname).toBe(athleteData.firstname);
+      expect(userInDb?.profilePicture).toBe(athleteData.profile);
+      expect(userInDb?.accessToken).toBe(tokenData.access_token);
     });
-
-    expect(userInDb).not.toBeNull();
-    expect(userInDb?.stravaId).toBe(athleteData.id);
-    expect(userInDb?.firstname).toBe(athleteData.firstname);
-    expect(userInDb?.profilePicture).toBe(athleteData.profile);
-    expect(userInDb?.accessToken).toBe(tokenData.access_token);
+  
+    it('should update an existing user in the database', async () => {
+      // Arrange: Create an initial user.
+      await userService.upsertUserFromStrava(athleteData, tokenData);
+  
+      // Act: Call the method again with updated token data
+      const updatedTokenData = {
+        ...tokenData,
+        access_token: 'new_access_token',
+        expires_at: 1672534800, // 2023-01-01 01:00:00
+      };
+      await userService.upsertUserFromStrava(athleteData, updatedTokenData);
+  
+      // Assert: Verify the user was updated.
+      const userInDb = await prisma.user.findUnique({
+        where: { stravaId: athleteData.id },
+      });
+  
+      const userCount = await prisma.user.count();
+      expect(userCount).toBe(1); // Ensure no new user was created.
+  
+      expect(userInDb).not.toBeNull();
+      expect(userInDb?.accessToken).toBe(updatedTokenData.access_token);
+      expect(userInDb?.tokenExpiresAt).toEqual(new Date(updatedTokenData.expires_at * 1000));
+    });
   });
 
-  it('should update an existing user in the database', async () => {
-    // Arrange: Create an initial user.
-    await userService.upsertUserFromStrava(athleteData, tokenData);
+  describe('getUserProfile', () => {
+    it('should return a user profile for a valid token', async () => {
+      // Arrange: Create a user and a valid JWT for them.
+      const createdUser = await userService.upsertUserFromStrava(athleteData, tokenData);
+      const validToken = jwt.sign({ stravaId: createdUser.stravaId }, process.env.JWT_SECRET!);
 
-    // Act: Call the method again with updated token data
-    const updatedTokenData = {
-      ...tokenData,
-      access_token: 'new_access_token',
-      expires_at: 1672534800, // 2023-01-01 01:00:00
-    };
-    await userService.upsertUserFromStrava(athleteData, updatedTokenData);
+      // Act
+      const userProfile = await userService.getUserProfile(validToken);
 
-    // Assert: Verify the user was updated.
-    const userInDb = await prisma.user.findUnique({
-      where: { stravaId: athleteData.id },
+      // Assert
+      expect(userProfile).not.toBeNull();
+      expect(userProfile.id).toBe(createdUser.id);
+      expect(userProfile.firstname).toBe(createdUser.firstname);
+      expect(userProfile.lastname).toBe(createdUser.lastname);
+      expect(userProfile.profilePicture).toBe(createdUser.profilePicture);
+      // Ensure it doesn't return sensitive data
+      expect(userProfile).not.toHaveProperty('accessToken');
     });
 
-    const userCount = await prisma.user.count();
-    expect(userCount).toBe(1); // Ensure no new user was created.
+    it('should throw a 404 error if the user in the token does not exist', async () => {
+      // Arrange: Create a token for a user that doesn't exist in the DB.
+      const nonExistentStravaId = 99999;
+      const tokenForNonExistentUser = jwt.sign({ stravaId: nonExistentStravaId }, process.env.JWT_SECRET!);
 
-    expect(userInDb).not.toBeNull();
-    expect(userInDb?.accessToken).toBe(updatedTokenData.access_token);
-    expect(userInDb?.tokenExpiresAt).toEqual(new Date(updatedTokenData.expires_at * 1000));
+      // Act & Assert
+      await expect(userService.getUserProfile(tokenForNonExistentUser)).rejects.toThrow('User not found');
+    });
+
+    it('should throw a 401 error for an invalid token', async () => {
+      // Arrange
+      const invalidToken = 'this.is.not.a.valid.token';
+
+      // Act & Assert
+      await expect(userService.getUserProfile(invalidToken)).rejects.toThrow('Invalid or expired token');
+    });
   });
 });

@@ -5,6 +5,9 @@ import createError from 'http-errors';
 import crypto from 'crypto';
 import { UserService } from '../services/userService';
 import { extractStravaAccessToken, extractUserIdFromRequest } from '../utils/auth';
+import { HttpStatusCode } from 'axios';
+
+const { BadRequest } = HttpStatusCode;
 
 export class AuthController {
   private authService: AuthService;
@@ -60,7 +63,7 @@ export class AuthController {
       const { code, state } = req.query;
 
       if (!code || !state) {
-        return next(createError(400, 'Missing code or state'));
+        return next(createError(BadRequest, 'Missing code or state'));
       }
 
       try {
@@ -80,7 +83,7 @@ export class AuthController {
         res.redirect(redirectUrl);
       } catch (error: any) {
         if (error.name === 'TokenExpiredError') {
-          return next(createError(400, 'OAuth state expired, please retry login.'));
+          return next(createError(BadRequest, 'OAuth state expired, please retry login.'));
         }
         next(error);
       }
