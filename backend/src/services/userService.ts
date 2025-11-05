@@ -22,6 +22,14 @@ export class UserService {
     return user;
   }
 
+  async getPartialUserById(userId: number): Promise<Partial<User>> {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw createError(NotFound, 'User not found');
+    }
+    return UserMapper.toPartialUser(user);
+  }
+
   async upsertUserFromStrava(tokens: StravaTokens) {
     const userDbo = UserMapper.toUserDbo(tokens);
     return this.userRepository.upsert(userDbo);
