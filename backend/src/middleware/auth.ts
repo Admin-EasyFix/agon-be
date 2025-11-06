@@ -6,12 +6,20 @@ import { AuthService } from '../services/authService';
 import { HttpStatusCode } from 'axios';
 const { Unauthorized, NotFound } = HttpStatusCode;
 
-const jwtSecret = process.env.JWT_SECRET!;
-const userService = new UserService();
-const authService = new AuthService();
-
-export async function extractUserIdFromRequest(req: Request): Promise<number> {
+export function extractUserIdFromRequest(req: Request): number {
   try {
+    if (!process.env.JWT_SECRET) {
+      throw createError(Unauthorized, 'JWT_SECRET is not set in env.');
+    }
+
+    if (!req.headers.authorization) {
+      throw createError(Unauthorized, 'Missing Authorization header');
+    }
+
+    if (!req.headers.authorization.startsWith('Bearer ')) {
+      throw createError(Unauthorized, 'Invalid Authorization header format');
+    }
+    
     const authHeader = req.headers.authorization;
     const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
 
@@ -19,7 +27,7 @@ export async function extractUserIdFromRequest(req: Request): Promise<number> {
       throw createError(Unauthorized, 'Missing or invalid Authorization header');
     }
 
-    const decodedToken = jwt.verify(token, jwtSecret) as { id: number };
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as { id: number };
     const userId = decodedToken?.id;
     if (!userId) {
       throw createError(Unauthorized, 'Invalid JWT: user ID missing');
@@ -31,9 +39,9 @@ export async function extractUserIdFromRequest(req: Request): Promise<number> {
   }
 }
 
-export async function extractStravaAccessToken(req: Request): Promise<string> {
+export async function extractStravaAccessToken(req: Request, userService: UserService = new UserService(), authService: AuthService = new AuthService()): Promise<string> {
   try {
-    const userId = await extractUserIdFromRequest(req);
+    const userId = extractUserIdFromRequest(req);
     const stravaTokens = await userService.getStravaTokensById(userId);
     if (!stravaTokens) {
       throw createError(NotFound, 'Strava tokens not found for the user');

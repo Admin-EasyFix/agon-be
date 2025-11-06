@@ -79,10 +79,10 @@ export class AuthService {
       });
 
       const tokens = response.data as StravaTokens;
-      console.log("✅ Token refreshed successfully.");
+      console.log("Token refreshed successfully.");
       return tokens;
     } catch (error: any) {
-      console.error("❌ Failed to refresh Strava token:", error.response?.data || error.message);
+      console.error("Failed to refresh Strava token:", error.response?.data || error.message);
       throw new Error("Failed to refresh Strava access token");
     }
   };
@@ -93,13 +93,10 @@ export class AuthService {
    */
   deauthorize = async (accessToken: string): Promise<void> => {
     try {
-      console.log("🚫 Revoking Strava token...");
       await axios.post(`${AuthService.stravaAuthBase}/deauthorize`, {
         access_token: accessToken,
       });
-      console.log("✅ Strava token revoked successfully.");
     } catch (error: any) {
-      console.error("❌ Failed to revoke Strava token:", error.response?.data || error.message);
       throw new Error("Failed to revoke Strava token");
     }
   };
