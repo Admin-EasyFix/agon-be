@@ -41,6 +41,9 @@ export function extractUserIdFromRequest(req: Request): number {
 
 export async function extractStravaAccessToken(req: Request, userService: UserService = new UserService(), authService: AuthService = new AuthService()): Promise<string> {
   try {
+    if (userService == null || authService == null) {
+      throw new Error('UserService or AuthService is not provided');
+    }
     const userId = extractUserIdFromRequest(req);
     const stravaTokens = await userService.getStravaTokensById(userId);
     if (!stravaTokens) {
