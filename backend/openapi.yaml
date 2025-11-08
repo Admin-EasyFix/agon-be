@@ -3,15 +3,20 @@ info:
   title: Agon Backend API
   description: API for the Agon fitness dashboard, providing access to Strava data, AI-powered suggestions, and analytics.
   version: 1.0.0
+
 servers:
   - url: http://localhost:4000
     description: Local development server
+
 tags:
   - name: General
+    description: General utility endpoints.
   - name: Auth
+    description: Authentication and authorization with Strava.
   - name: Activities
+    description: Endpoints related to user activities and AI suggestions.
   - name: User
-    description: User-related endpoints
+    description: User-related endpoints.
 
 paths:
   /:
@@ -33,7 +38,7 @@ paths:
     get:
       summary: Get User Activities
       description: Fetches a list of the authenticated user's most recent activities from Strava.
-      tags: 
+      tags:
         - Activities
       security:
         - BearerAuth: []
@@ -51,19 +56,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/UnauthorizedError'
         '500':
           description: Internal Server Error. An unexpected error occurred on the server.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/InternalServerError'
 
   /api/suggest:
     get:
       summary: Get Activity Suggestion
       description: Generates an AI-powered suggestion for the user's next activity based on their recent training history.
-      tags:   
+      tags:
         - Activities
       security:
         - BearerAuth: []
@@ -79,13 +84,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/UnauthorizedError'
         '500':
           description: Internal Server Error. An unexpected error occurred on the server.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/InternalServerError'
 
   /api/strava/auth/authorize:
     get:
@@ -110,7 +115,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/InternalServerError'
 
   /api/strava/auth/callback:
     get:
@@ -131,8 +136,7 @@ paths:
         - name: state
           in: query
           required: true
-          description: >
-            The state parameter containing the `redirect_uri` and a nonce for security.
+          description: The encoded state parameter containing the `redirect_uri` and a nonce for security.
           schema:
             type: string
       responses:
@@ -145,14 +149,41 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/BadRequestError'
         '500':
           description: Internal Server Error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  
+                $ref: '#/components/schemas/InternalServerError'
+
+  /api/strava/auth/deauthorize:
+    post:
+      summary: Logout
+      description: >
+        Deauthorizes the user from Strava and invalidates their access token. 
+        This endpoint removes the user's Strava tokens from the database and 
+        ensures the user is logged out of the application.
+      tags:
+        - Auth
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Successfully logged out and deauthorized from Strava.
+        '401':
+          description: Unauthorized. The Bearer token is missing, invalid, or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal Server Error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
   /api/users/profile:
     get:
       summary: Get User Profile
@@ -170,20 +201,24 @@ paths:
                 $ref: '#/components/schemas/UserProfile'
         '401':
           description: Unauthorized. The token is missing, invalid, or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
         '500':
           description: Internal Server Error.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/InternalServerError'
 
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT # Or Opaque, depending on the token type
-      description: "User's Strava access token."
+      bearerFormat: JWT
+      description: "JWT used to authenticate API requests."
 
   schemas:
     Activity:
@@ -220,6 +255,7 @@ components:
           description: Average heart rate in beats per minute.
         type:
           $ref: '#/components/schemas/ActivityType'
+
     UserProfile:
       type: object
       properties:
@@ -234,8 +270,10 @@ components:
           description: The user's last name.
         profilePicture:
           type: string
+          format: uri
           description: URL to the user's profile picture.
-    Error:
+
+    UnauthorizedError:
       type: object
       properties:
         status:
@@ -247,6 +285,33 @@ components:
           type: string
           description: A human-readable error message.
           example: "Unauthorized: Invalid or expired Strava token."
+
+    InternalServerError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code.
+          example: 500
+        message:
+          type: string
+          description: A human-readable error message.
+          example: "Internal Server Error: An unexpected error occurred."
+
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code.
+          example: 400
+        message:
+          type: string
+          description: A human-readable error message.
+          example: "Bad Request: Missing or invalid parameters."
+
     ActivityType:
       type: string
       enum:

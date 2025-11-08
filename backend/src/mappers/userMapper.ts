@@ -1,5 +1,6 @@
 import { StravaTokens } from '../types/strava/StravaTokens';
 import { UserDbo } from '../types/domain/UserDBO';
+import { User } from '@prisma/client';
 
 export const UserMapper = {
   toUserDbo(tokens: StravaTokens): UserDbo {
@@ -14,21 +15,29 @@ export const UserMapper = {
       tokenExpiresAt: tokenExpiresAt,
     };
   },
-  toStravaTokens(dbo: UserDbo): StravaTokens {
-    const expiresAtSec = Math.floor(dbo.tokenExpiresAt.getTime() / 1000);
+  toStravaTokens(user: User): StravaTokens {
+    const expiresAtSec = Math.floor(user.tokenExpiresAt.getTime() / 1000);
     const nowSec = Math.floor(Date.now() / 1000);
     return {
-      access_token: dbo.accessToken,
-      refresh_token: dbo.refreshToken,
+      access_token: user.accessToken,
+      refresh_token: user.refreshToken,
       expires_at: expiresAtSec,
       expires_in: expiresAtSec - nowSec,
       token_type: "Bearer",
       athlete: {
-        id: dbo.stravaId,
-        firstname: dbo.firstname,
-        lastname: dbo.lastname,
-        profile: dbo.profilePicture
+        id: user.stravaId,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        profile: user.profilePicture
       } as StravaTokens["athlete"],
+    };
+  },
+  toPartialUser(user: User): Partial<User> {
+    return {
+      id: user.id,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      profilePicture: user.profilePicture,
     };
   }
 };
