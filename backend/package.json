@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "main": "src/app.ts",
   "scripts": {
     "dev": "ts-node src/app.ts",
@@ -12,6 +12,7 @@
     "db:dev:down": "docker-compose -f docker-compose.yml down",
     "db:dev:wait": "dotenv -e .env -- node scripts/waitForDb.js",
     "db:migrate": "dotenv -e .env -- npx prisma migrate dev --name init",
+    "db:deploy": "dotenv -e .env.dev -- npx prisma migrate deploy",
     "db:test:up": "docker-compose -f docker-compose.test.yml up -d",
     "db:test:down": "docker-compose -f docker-compose.test.yml down",
     "db:test:wait": "dotenv -e .env.test -- node scripts/waitForDb.js",
