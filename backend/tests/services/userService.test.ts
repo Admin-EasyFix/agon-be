@@ -4,7 +4,6 @@ import { UserRepository } from '../../src/repositories/userRepository';
 import { UserMapper } from '../../src/mappers/userMapper';
 import { UserDbo } from '../../src/types/domain/UserDBO';
 import { StravaAthlete } from '../../src/types/strava/StravaAthlete';
-import jwt from 'jsonwebtoken';
 import createError from 'http-errors';
 
 // Mock dependencies
