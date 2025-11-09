@@ -77,6 +77,12 @@ export class AuthController {
           return next(createError(400, 'Invalid redirect_uri in state'));
         }
         const tokens = await this.authService.exchangeCodeForToken(code as string);
+        try {
+          const existingTokens = await this.userService.getStravaTokensByStravaId(tokens.athlete.id);
+          if (existingTokens) {
+            await this.authService.deauthorize(existingTokens.access_token);
+          }
+        } catch (error: any) { }
         const user = await this.userService.upsertUserFromStrava(tokens);
         const token = jwt.sign({ id: user.id }, this.jwtSecret!, { expiresIn: '7d' });
         const redirectUrl = `${decodedState.redirect_uri}#token=${encodeURIComponent(token)}`;
