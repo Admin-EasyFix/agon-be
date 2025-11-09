@@ -4,7 +4,6 @@ import { UserRepository } from '../../src/repositories/userRepository';
 import { UserMapper } from '../../src/mappers/userMapper';
 import { UserDbo } from '../../src/types/domain/UserDBO';
 import { StravaAthlete } from '../../src/types/strava/StravaAthlete';
-import jwt from 'jsonwebtoken';
 import createError from 'http-errors';
 
 // Mock dependencies
@@ -96,11 +95,11 @@ describe('UserService', () => {
       vi.spyOn(UserMapper, 'toUserDbo').mockReturnValue(userDbo);
       vi.spyOn(mockUserRepository, 'upsert').mockResolvedValue(expectedUserResult as any);
       // Act
-      const result = await userService.upsertUserFromStrava(athleteData, tokenData);
+      const result = await userService.upsertUserFromStrava(tokenData);
   
       // Assert
       // 1. Check that the mapper was called correctly
-      expect(UserMapper.toUserDbo).toHaveBeenCalledWith(athleteData, tokenData);
+      expect(UserMapper.toUserDbo).toHaveBeenCalledWith(tokenData);
   
       // 2. Check that the repository was called with the result from the mapper
       expect(mockUserRepository.upsert).toHaveBeenCalledWith(userDbo);
@@ -110,50 +109,51 @@ describe('UserService', () => {
     });
   });
 
-  describe('getUserProfile', () => {
-    it('should return user profile for a valid token', async () => {
-      // Arrange
-      const token = 'valid.token.here';
-      const decodedPayload = { stravaId: 123 };
-      const mockUser = { id: 1, firstname: 'Test', lastname: 'User', profilePicture: 'url' };
+  describe('getPartialUserById', () => {
+  it('should return partial user for a valid user ID', async () => {
+    // Arrange
+    const userId = 1;
+    const mockUser = {
+      id: 1,
+      stravaId: 12345,
+      firstname: 'Test',
+      lastname: 'User',
+      profilePicture: 'url',
+      accessToken: 'test_access_token',
+      refreshToken: 'test_refresh_token',
+      tokenExpiresAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const partialUser = {
+      id: 1,
+      firstname: 'Test',
+      lastname: 'User',
+      profilePicture: 'url',
+    };
 
-      vi.mocked(jwt.verify).mockReturnValue(decodedPayload as any);
-      vi.mocked(mockUserRepository.findByStravaId).mockResolvedValue(mockUser);
+    vi.mocked(mockUserRepository.get).mockResolvedValue(mockUser);
+    vi.spyOn(UserMapper, 'toPartialUser').mockReturnValue(partialUser);
 
-      // Act
-      const result = await userService.getUserProfile(token);
+    // Act
+    const result = await userService.getPartialUserById(userId);
 
-      // Assert
-      expect(jwt.verify).toHaveBeenCalledWith(token, process.env.JWT_SECRET);
-      expect(mockUserRepository.findByStravaId).toHaveBeenCalledWith(decodedPayload.stravaId);
-      expect(result).toEqual(mockUser);
-    });
-
-    it('should throw 401 Unauthorized for an invalid or expired token', async () => {
-      // Arrange
-      const token = 'invalid.token.here';
-      vi.mocked(jwt.verify).mockImplementation(() => {
-        throw new Error('Invalid token');
-      });
-
-      // Act & Assert
-      await expect(userService.getUserProfile(token)).rejects.toThrow('Invalid or expired token');
-      expect(mockUserRepository.findByStravaId).not.toHaveBeenCalled();
-    });
-
-    it('should throw 404 Not Found if user does not exist', async () => {
-      // Arrange
-      const token = 'valid.token.for.nonexistent.user';
-      const decodedPayload = { stravaId: 404 };
-
-      vi.mocked(jwt.verify).mockReturnValue(decodedPayload as any);
-      // Mock the repository to return null, simulating a user not found
-      vi.mocked(mockUserRepository.findByStravaId).mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(userService.getUserProfile(token)).rejects.toThrow('User not found');
-      expect(jwt.verify).toHaveBeenCalledWith(token, process.env.JWT_SECRET);
-      expect(mockUserRepository.findByStravaId).toHaveBeenCalledWith(decodedPayload.stravaId);
-    });
+    // Assert
+    expect(mockUserRepository.get).toHaveBeenCalledWith(userId);
+    expect(UserMapper.toPartialUser).toHaveBeenCalledWith(mockUser);
+    expect(result).toEqual(partialUser);
   });
+
+  it('should throw 404 Not Found if user does not exist', async () => {
+    // Arrange
+    const userId = 404;
+
+    vi.mocked(mockUserRepository.get).mockResolvedValue(null);
+
+    // Act & Assert
+    await expect(userService.getPartialUserById(userId)).rejects.toThrow('User not found');
+    expect(mockUserRepository.get).toHaveBeenCalledWith(userId);
+    expect(UserMapper.toPartialUser).not.toHaveBeenCalled();
+  });
+});
 });
