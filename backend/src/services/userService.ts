@@ -24,9 +24,6 @@ export class UserService {
 
   async getPartialUserById(userId: number): Promise<Partial<User>> {
     const user = await this.getUserById(userId);
-    if (!user) {
-      throw createError(NotFound, 'User not found');
-    }
     return UserMapper.toPartialUser(user);
   }
 
@@ -37,6 +34,14 @@ export class UserService {
 
   async getStravaTokensById(userId: number): Promise<StravaTokens | null> {
     const user = await this.userRepository.get(userId);
+    if (!user) {
+      throw createError(NotFound, 'User not found');
+    }
+    return user ? UserMapper.toStravaTokens(user) : null;
+  }
+
+  async getStravaTokensByStravaId(stravaId: number): Promise<StravaTokens | null> {
+    const user = await this.userRepository.getByStravaId(stravaId);
     if (!user) {
       throw createError(NotFound, 'User not found');
     }

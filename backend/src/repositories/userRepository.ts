@@ -23,6 +23,12 @@ export class UserRepository {
     });
   }
 
+  async getByStravaId(stravaId: number): Promise<User | null> {
+    return prisma.user.findUnique({
+      where: { stravaId }
+    });
+  }
+
   async delete(id: number): Promise<void> {
     await prisma.user.delete({
       where: { id }

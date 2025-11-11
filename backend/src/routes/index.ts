@@ -23,5 +23,5 @@ export function setRoutes(app: Application) {
     app.get('/api/suggest', stravaController.getSuggestion.bind(stravaController));
 
     // User endpoints
-    app.get('/api/users/profile', userController.getProfile.bind(UserController));
+    app.get('/api/users/profile', userController.getProfile.bind(userController));
 }
