@@ -24,9 +24,6 @@ export class UserService {
 
   async getPartialUserById(userId: number): Promise<Partial<User>> {
     const user = await this.getUserById(userId);
-    if (!user) {
-      throw createError(NotFound, 'User not found');
-    }
     return UserMapper.toPartialUser(user);
   }
 

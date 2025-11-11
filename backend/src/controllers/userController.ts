@@ -15,7 +15,7 @@ export class UserController {
    */
   async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const userId = await extractUserIdFromRequest(req);
+      const userId = extractUserIdFromRequest(req);
       const user = await this.userService.getPartialUserById(userId);
       res.json(user);
     } catch (error) {
