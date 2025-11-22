@@ -31,8 +31,8 @@ export class ApiClient {
     return this.client.get<string>("/");
   }
 
-  authorize() {
-    return this.client.get("/api/strava/auth/authorize");
+  getAuthorizationUrl(redirectUri: string) {
+    return this.client.get("/api/strava/auth/authorize?redirect_uri=" + encodeURIComponent(redirectUri));
   }
 
   deauthorize() {
@@ -51,3 +51,5 @@ export class ApiClient {
     return this.client.get<User>("/api/users/profile");
   }
 }
+
+export const apiClient = new ApiClient();

@@ -27,7 +27,7 @@ export class AuthController {
    * GET /api/strava/auth/authorize
    * Redirects the user to Strava's OAuth2 authorization page.
    */
-    redirectToStrava = (req: Request, res: Response, next: NextFunction) => {
+    getStravaAuthorizationUrl = (req: Request, res: Response, next: NextFunction) => {
         try {
           const { redirect_uri } = req.query;
           if (!redirect_uri) {
@@ -48,8 +48,8 @@ export class AuthController {
 
           const nonce = crypto.randomBytes(8).toString('hex');
           const state = jwt.sign({ nonce, redirect_uri }, this.jwtSecret!, { expiresIn: '5m' });
-          const authorizationUrl = this.authService.getAuthorizationUrl(state);
-          res.redirect(authorizationUrl);
+          const authorzation_url = this.authService.getAuthorizationUrl(state);
+          res.status(200).json(authorzation_url);
         } catch (error) {
             next(error);
         }

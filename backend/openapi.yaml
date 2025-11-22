@@ -108,8 +108,8 @@ paths:
             format: uri
             example: "http://your-client-app.com/dashboard"
       responses:
-        '302':
-          description: Redirect to Strava's authorization page.
+        '200':
+          description: Authorization URL to redirect the user to Strava's authorization page.
         '500':
           description: Internal Server Error.
           content:
