@@ -7,11 +7,15 @@ function LoginCard() {
 
   const handleLogin = () => {
     setIsLoggingIn(true);
-    console.log("Logging in...");
-    apiClient.getAuthorizationUrl('http://localhost:5173').then((response) => {
-      console.log("Authorization URL:", response.data);
-      window.location.href = response.data;
-    }).catch((error) => {
+    apiClient.getAuthorizationUrl(window.location.origin)
+    .then((response) => {
+      const url = (response.data as { authorization_url?: string })?.authorization_url;
+      if (!url) {
+        throw new Error("Missing authorization_url in response");
+      }
+      window.location.href = url;
+    })
+    .catch((error) => {
       console.error("Failed to get authorization URL:", error);
       setIsLoggingIn(false);
     });

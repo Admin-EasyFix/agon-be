@@ -48,8 +48,8 @@ export class AuthController {
 
           const nonce = crypto.randomBytes(8).toString('hex');
           const state = jwt.sign({ nonce, redirect_uri }, this.jwtSecret!, { expiresIn: '5m' });
-          const authorzation_url = this.authService.getAuthorizationUrl(state);
-          res.status(200).json(authorzation_url);
+          const authorization_url = this.authService.getAuthorizationUrl(state);
+          res.status(200).json( { authorization_url } );
         } catch (error) {
             next(error);
         }
