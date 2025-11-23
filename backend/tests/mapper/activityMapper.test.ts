@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { ActivityMapper } from '../../src/mappers/activityMapper';
-import type { StravaActivity } from '../../src/types/StravaActivity';
+import type { StravaActivity } from '../../src/types/strava/StravaActivity';
 
 class FakeAIService {
   generateCommentForActivity(activity: StravaActivity): string {
