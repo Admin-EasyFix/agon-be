@@ -1,19 +1,44 @@
 import Features from "./components/Features";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
-import { useContext } from "react";
-import { AuthContext } from "react-oauth2-code-pkce";
+import { useState } from "react";
 import LoginCard from "./components/LoginCard";
 import { ActivityListCard } from "./components/ActivityListCard";
 import { AIRecommendationCard } from "./components/AIRecommendationCard";
 import { useStravaActivities } from "./hooks/useStravaActivities";
 import Navbar from "./components/Navbar";
+import { useEffect } from "react";
+import { apiClient } from "./api/apiClient";
 
 function App() {
-  const { token, error } = useContext(AuthContext);
-  const { activities, loading, error: apiError, refetch } = useStravaActivities(token);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { activities, loading, error: apiError, refetch } = useStravaActivities("auth_token" in localStorage ? localStorage.getItem("auth_token") : null);
 
-  const isAuthenticated = !!token;
+  useEffect(() => {
+    const authenticateUser = () => {
+      const localToken = localStorage.getItem("auth_token");
+      if (localToken) {
+        setIsAuthenticated(true);
+        apiClient.setToken(localToken);
+        console.log("User authenticated with token from localStorage.");
+        return;
+      }
+
+      const hash = window.location.hash;
+      const params = new URLSearchParams(hash.replace(/^#\/?/, ""));
+      const urlToken = params.get("token");
+
+      if (urlToken) {
+        setIsAuthenticated(true);
+        localStorage.setItem("auth_token", urlToken);
+        apiClient.setToken(urlToken);
+        console.log("User authenticated with token from URL.");
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    };
+
+    authenticateUser();
+  }, []);
 
   return (
     <main>
@@ -23,11 +48,6 @@ function App() {
             <Hero />
             <Features />
             <LoginCard />
-            {error && (
-              <div className="text-red-500 text-sm mt-4">
-                Authentication error: {error}
-              </div>
-            )}
           </div>
         ) : (
           <div>

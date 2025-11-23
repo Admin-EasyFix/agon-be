@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { StravaService } from '../../src/services/stravaService';
-import type { StravaActivity } from '../../src/types/StravaActivity';
+import type { StravaActivity } from '../../src/types/strava/StravaActivity';
 import { StravaClient } from '../../src/clients/stravaClient';
 
 vi.mock('../../src/clients/stravaClient');
