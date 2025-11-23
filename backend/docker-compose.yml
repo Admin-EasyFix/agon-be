@@ -1,16 +1,12 @@
 services:
-  db:
-    image: postgres:15
-    container_name: agon-db
-    restart: always
+  postgres_dev:
+    image: postgres:14-alpine
+    container_name: agon_postgres_dev
     environment:
-      POSTGRES_USER: "agon"
-      POSTGRES_PASSWORD: "agon"
-      POSTGRES_DB: "agon"
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: agon_dev
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
-      - db_data:/var/lib/postgresql/data
-
-volumes:
-  db_data:
+      - ./dev-db-data:/var/lib/postgresql/data

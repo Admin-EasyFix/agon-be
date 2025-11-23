@@ -1,6 +1,6 @@
 import { Activity} from '../types/Activity';
 import { GeminiClient } from '../clients/geminiClient';
-import { StravaActivity } from '../types/StravaActivity';
+import { StravaActivity } from '../types/strava/StravaActivity';
 import { ActivityMapper } from '../mappers/activityMapper';
 import {
   WELCOME_SUGGESTION,
