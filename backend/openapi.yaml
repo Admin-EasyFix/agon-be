@@ -108,8 +108,19 @@ paths:
             format: uri
             example: "http://your-client-app.com/dashboard"
       responses:
-        '302':
-          description: Redirect to Strava's authorization page.
+        '200':
+          description: Authorization URL to redirect the user to Strava's authorization page.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authorization_url:
+                    type: string
+                    description: The URL to redirect the user for Strava authorization.
+                    example: https://www.strava.com/oauth/authorize?client_id=YOUR_CLIENT
+                required:
+                  - authorization_url
         '500':
           description: Internal Server Error.
           content:
