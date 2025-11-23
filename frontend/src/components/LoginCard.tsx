@@ -1,14 +1,24 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "react-oauth2-code-pkce";
+import { useState } from "react";
+import { apiClient } from "../api/apiClient";
 import "../styles/auth.css";
 
 function LoginCard() {
-  const { logIn } = useContext(AuthContext);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleLogin = () => {
     setIsLoggingIn(true);
-    logIn();
+    apiClient.getAuthorizationUrl(window.location.origin)
+    .then((response) => {
+      const url = (response.data as { authorization_url?: string })?.authorization_url;
+      if (!url) {
+        throw new Error("Missing authorization_url in response");
+      }
+      window.location.href = url;
+    })
+    .catch((error) => {
+      console.error("Failed to get authorization URL:", error);
+      setIsLoggingIn(false);
+    });
   };
 
   return (
