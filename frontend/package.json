@@ -1,7 +1,7 @@
 {
   "name": "agon",
   "private": true,
-  "version": "0.17.1",
+  "version": "0.17.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -21,7 +21,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.37.0",
+    "@eslint/js": "^9.38.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.4",
