@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { ApiClient } from "../api/apiClient";
+import { apiClient } from "../api/apiClient";
 import type { User } from "../types/User";
 
 interface UseAthleteResult {
@@ -24,8 +24,7 @@ export function useAthlete(token: string | null): UseAthleteResult {
     setError(null);
 
     try {
-      const client = new ApiClient();
-      const athleteData = await client.getUserProfile().then(res => res.data);
+      const athleteData = await apiClient.getUserProfile().then(res => res.data);
       setAthlete(athleteData);
     } catch (err) {
       console.error("Error fetching athlete:", err);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ApiClient } from '../api/apiClient';
+import { apiClient } from '../api/apiClient';
 import type { Activity } from '../types/Activity';
 
 interface UseStravaActivitiesResult {
@@ -24,8 +24,7 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
     setError(null);
     
     try {
-      const client = new ApiClient();
-      const stravaActivities = await client.getActivities().then(res => res.data);
+      const stravaActivities = await apiClient.getActivities().then(res => res.data);
       
       setActivities(stravaActivities);
     } catch (err) {
