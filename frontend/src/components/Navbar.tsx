@@ -41,7 +41,7 @@ function Navbar() {
           </div>
         ) : (
           <img
-            src={athlete?.profile || userIcon}
+            src={athlete?.profilePicture || userIcon}
             alt="Profile"
             className="profile-pic"
             onClick={apiError ? refetch : toggleMenu}

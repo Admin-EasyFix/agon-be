@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
-import { StravaClient } from "../api/strava/client";
-import type { Athlete } from "../types/strava";
+import { ApiClient } from "../api/apiClient";
+import type { User } from "../types/User";
 
 interface UseAthleteResult {
-  athlete: Athlete | null;
+  athlete: User | null;
   loading: boolean;
   error: string | null;
   refetch: () => void;
 }
 
 export function useAthlete(token: string | null): UseAthleteResult {
-  const [athlete, setAthlete] = useState<Athlete | null>(null);
+  const [athlete, setAthlete] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,8 +24,8 @@ export function useAthlete(token: string | null): UseAthleteResult {
     setError(null);
 
     try {
-      const client = new StravaClient(token);
-      const athleteData = await client.fetchAthlete();
+      const client = new ApiClient();
+      const athleteData = await client.getUserProfile().then(res => res.data);
       setAthlete(athleteData);
     } catch (err) {
       console.error("Error fetching athlete:", err);

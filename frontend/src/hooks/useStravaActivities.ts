@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
-import { StravaClient } from '../api/strava/client';
-import type { Activity } from '../types/strava';
-//import { GeminiClient } from '../api/gemini/client';
-
-//const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+import { ApiClient } from '../api/apiClient';
+import type { Activity } from '../types/Activity';
 
 interface UseStravaActivitiesResult {
   activities: Activity[];
@@ -27,8 +24,8 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
     setError(null);
     
     try {
-      const client = new StravaClient(token);
-      const stravaActivities = await client.fetchActivities(5, 1);
+      const client = new ApiClient();
+      const stravaActivities = await client.getActivities().then(res => res.data);
       
       setActivities(stravaActivities);
     } catch (err) {
@@ -41,7 +38,7 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
 
   useEffect(() => {
     fetchActivities();
-  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [token]);
 
   return {
     activities,
