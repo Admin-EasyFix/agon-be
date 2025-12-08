@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
-import { StravaClient } from '../api/strava/client';
-import type { Activity } from '../types/strava';
-//import { GeminiClient } from '../api/gemini/client';
-
-//const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+import { useState, useEffect, useCallback } from 'react';
+import { apiClient } from '../api/apiClient';
+import type { Activity } from '../types/Activity';
+import { isAxiosError } from 'axios';
+import { useLogout } from './useLogout';
 
 interface UseStravaActivitiesResult {
   activities: Activity[];
@@ -16,61 +15,40 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { logout } = useLogout();
 
-  // const generateAIComment = async (activity: Activity): Promise<string> => {
-  //   try {
-  //     const ai = new GeminiClient(apiKey);
-  //     return await ai.generateComment(activity);
-  //   } catch (error) {
-  //     console.error('Failed to generate AI comment:', error);
-  //     const distanceKm = activity.distance ? activity.distance / 1000 : 0;
-  //     const durationMinutes = activity.moving_time ? activity.moving_time / 60 : 0;
-      
-  //     if (distanceKm > 10) {
-  //       return "Impressive long distance workout! Your endurance is really building up.";
-  //     } else if (distanceKm > 5) {
-  //       return "Great mid-distance effort! Keep up the consistent training.";
-  //     } else if (durationMinutes > 60) {
-  //       return "Nice long training session! Time on feet is valuable.";
-  //     } else if (activity.average_heartrate && activity.average_heartrate > 150) {
-  //       return "High intensity workout! Great for building speed and power.";
-  //     } else {
-  //       const comments = [
-  //         "Solid training session. Every workout counts!",
-  //         "Good effort! Consistency is key to improvement.",
-  //         "Nice work! Building that base fitness."
-  //       ];
-  //       return comments[Math.floor(Math.random() * comments.length)];
-  //     }
-  //   }
-    
-  // };
+  const fetchActivities = useCallback(async () => {
+      if (!token) {
+        setActivities([]);
+        return;
+      }
 
-  const fetchActivities = async () => {
-    if (!token) {
-      setActivities([]);
-      return;
-    }
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const client = new StravaClient(token);
-      const stravaActivities = await client.fetchActivities(5, 1);
-      
-      setActivities(stravaActivities);
-    } catch (err) {
-      console.error('Error fetching activities:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch activities');
-    } finally {
-      setLoading(false);
-    }
-  };
+      setLoading(true);
+      setError(null);
+
+      try {
+        const stravaActivities = await apiClient.getActivities().then(res => res.data);
+
+        setActivities(stravaActivities);
+      } catch (err) {
+        if (isAxiosError(err) && err.response?.status === 401) {
+          setError('Your session has expired. Please log in again.');
+          logout();
+        } else {
+          console.error('Error fetching activities:', err);
+          setError('Failed to fetch activities. Please try again later.');
+        }
+        setActivities([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [token, logout],
+  );
 
   useEffect(() => {
     fetchActivities();
-  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchActivities]);
 
   return {
     activities,

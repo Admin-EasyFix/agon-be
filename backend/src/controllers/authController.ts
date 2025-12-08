@@ -82,7 +82,9 @@ export class AuthController {
           if (existingTokens) {
             await this.authService.deauthorize(existingTokens.access_token);
           }
-        } catch (error: any) { }
+        } catch (error: any) {
+          console.error('Failed to deauthorize existing token, continuing with login:', error);
+        }
         const user = await this.userService.upsertUserFromStrava(tokens);
         const token = jwt.sign({ id: user.id }, this.jwtSecret!, { expiresIn: '7d' });
         const redirectUrl = `${decodedState.redirect_uri}#token=${encodeURIComponent(token)}`;

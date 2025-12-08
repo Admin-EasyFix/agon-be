@@ -1,12 +1,14 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
+import useLogout from "../hooks/useLogout";
 import doveIcon from '../assets/golden_dove.svg';
 import userIcon from '../assets/user.png';
 import { useAthlete } from "../hooks/useStravaAthlete";
 import "../styles/navbar.css";
 
 function Navbar() {
-  const { token, logOut } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
+  const { logout, loading: logoutLoading, error: logoutError } = useLogout();
   const [open, setOpen] = useState(false);
   const { athlete, loading, error: apiError, refetch } = useAthlete(token);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -41,7 +43,7 @@ function Navbar() {
           </div>
         ) : (
           <img
-            src={athlete?.profile || userIcon}
+            src={athlete?.profilePicture || userIcon}
             alt="Profile"
             className="profile-pic"
             onClick={apiError ? refetch : toggleMenu}
@@ -49,7 +51,10 @@ function Navbar() {
         )}
         {open && (
           <div className="dropdown" ref={dropdownRef}>
-            <button onClick={logOut}>Logout</button>
+            <button onClick={() => logout()} disabled={logoutLoading}>
+              {logoutLoading ? "Logging out..." : "Logout"}
+            </button>
+            {logoutError && <div className="text-red-500 text-sm mt-2">{logoutError}</div>}
           </div>
         )}
       </div>

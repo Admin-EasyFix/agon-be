@@ -27,6 +27,10 @@ export class ApiClient {
     }
   }
 
+  hasToken(): boolean {
+    return !!this.client.defaults.headers.common["Authorization"];
+  }
+
   getIndex() {
     return this.client.get<string>("/");
   }
