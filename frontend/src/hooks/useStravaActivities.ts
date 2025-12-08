@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../api/apiClient';
 import type { Activity } from '../types/Activity';
+import { isAxiosError } from 'axios';
+import { useLogout } from './useLogout';
 
 interface UseStravaActivitiesResult {
   activities: Activity[];
@@ -28,8 +30,14 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
       
       setActivities(stravaActivities);
     } catch (err) {
-      console.error('Error fetching activities:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch activities');
+      if (isAxiosError(err) && err.response?.status === 401) {
+        setError('Your session has expired. Please log in again.');
+        useLogout().logout();
+      } else {
+        console.error('Error fetching activities:', err);
+        setError('Failed to fetch activities. Please try again later.');
+      }
+      setActivities([]);
     } finally {
       setLoading(false);
     }

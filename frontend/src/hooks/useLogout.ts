@@ -12,6 +12,7 @@ export function useLogout() {
     setError(null);
     try {
       await apiClient.deauthorize();
+      apiClient.setToken(null);
     } catch (err) {
       console.error("Error calling deauthorize endpoint:", err);
       setError(err instanceof Error ? err.message : String(err));

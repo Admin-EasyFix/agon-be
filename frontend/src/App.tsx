@@ -1,7 +1,6 @@
 import Features from "./components/Features";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
-import { useState } from "react";
 import LoginCard from "./components/LoginCard";
 import { ActivityListCard } from "./components/ActivityListCard";
 import { AIRecommendationCard } from "./components/AIRecommendationCard";
@@ -11,17 +10,19 @@ import { useEffect } from "react";
 import { apiClient } from "./api/apiClient";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { activities, loading, error: apiError, refetch } = useStravaActivities("auth_token" in localStorage ? localStorage.getItem("auth_token") : null);
 
   useEffect(() => {
     const authenticateUser = () => {
       const localToken = localStorage.getItem("auth_token");
       if (localToken) {
-        setIsAuthenticated(true);
         apiClient.setToken(localToken);
         console.log("User authenticated with token from localStorage.");
         return;
+      }
+      else {
+        apiClient.setToken(null);
+        console.log("User not authenticated.");
       }
 
       const hash = window.location.hash;
@@ -29,11 +30,11 @@ function App() {
       const urlToken = params.get("token");
 
       if (urlToken) {
-        setIsAuthenticated(true);
         localStorage.setItem("auth_token", urlToken);
         apiClient.setToken(urlToken);
         console.log("User authenticated with token from URL.");
         window.history.replaceState(null, "", window.location.pathname);
+        return;
       }
     };
 
@@ -43,7 +44,7 @@ function App() {
   return (
     <main>
       <div className="container">
-        {!isAuthenticated ? (
+        {!apiClient.hasToken() ? (
           <div className="flex flex-col items-center justify-center min-h-screen">
             <Hero />
             <Features />
