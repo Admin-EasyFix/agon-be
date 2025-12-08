@@ -86,18 +86,4 @@ export class AuthService {
       throw new Error("Failed to refresh Strava access token");
     }
   };
-
-  /**
-   * Deauthorizes (revokes) a Strava access token.
-   * This should be called when the user disconnects or logs out.
-   */
-  deauthorize = async (accessToken: string): Promise<void> => {
-    try {
-      await axios.post(`${AuthService.stravaAuthBase}/deauthorize`, {
-        access_token: accessToken,
-      });
-    } catch (error: any) {
-      throw new Error("Failed to revoke Strava token");
-    }
-  };
 }
