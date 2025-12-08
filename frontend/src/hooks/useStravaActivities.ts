@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../api/apiClient';
 import type { Activity } from '../types/Activity';
 import { isAxiosError } from 'axios';
@@ -17,36 +17,38 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
   const [error, setError] = useState<string | null>(null);
   const { logout } = useLogout();
 
-  const fetchActivities = async () => {
-    if (!token) {
-      setActivities([]);
-      return;
-    }
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const stravaActivities = await apiClient.getActivities().then(res => res.data);
-      
-      setActivities(stravaActivities);
-    } catch (err) {
-      if (isAxiosError(err) && err.response?.status === 401) {
-        setError('Your session has expired. Please log in again.');
-        logout();
-      } else {
-        console.error('Error fetching activities:', err);
-        setError('Failed to fetch activities. Please try again later.');
+  const fetchActivities = useCallback(async () => {
+      if (!token) {
+        setActivities([]);
+        return;
       }
-      setActivities([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const stravaActivities = await apiClient.getActivities().then(res => res.data);
+
+        setActivities(stravaActivities);
+      } catch (err) {
+        if (isAxiosError(err) && err.response?.status === 401) {
+          setError('Your session has expired. Please log in again.');
+          logout();
+        } else {
+          console.error('Error fetching activities:', err);
+          setError('Failed to fetch activities. Please try again later.');
+        }
+        setActivities([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [token, logout],
+  );
 
   useEffect(() => {
     fetchActivities();
-  }, [token]);
+  }, [fetchActivities]);
 
   return {
     activities,
