@@ -20,8 +20,9 @@ export function useLogout() {
       // Clear local auth state and call library logout if available
       try {
         localStorage.removeItem("auth_token");
-      } catch (e) {
-        // ignore
+      } catch (err) {
+        console.error("Error removing auth token:", err);
+        setError(err instanceof Error ? err.message : String(err));
       }
       try {
         if (typeof logOut === "function") logOut();
@@ -32,8 +33,9 @@ export function useLogout() {
       // navigate to root to reset UI
       try {
         window.location.href = "/";
-      } catch (e) {
-        // ignore
+      } catch (err) {
+        console.error("Error redirecting to home page", err);
+        setError(err instanceof Error ? err.message : String(err));
       }
     }
   };

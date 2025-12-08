@@ -15,6 +15,7 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { logout } = useLogout();
 
   const fetchActivities = async () => {
     if (!token) {
@@ -32,7 +33,7 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 401) {
         setError('Your session has expired. Please log in again.');
-        useLogout().logout();
+        logout();
       } else {
         console.error('Error fetching activities:', err);
         setError('Failed to fetch activities. Please try again later.');
