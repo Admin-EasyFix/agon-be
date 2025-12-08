@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { apiClient } from "../api/apiClient";
 import { AuthContext } from "react-oauth2-code-pkce";
 
@@ -7,7 +7,7 @@ export function useLogout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -38,7 +38,7 @@ export function useLogout() {
         setError(err instanceof Error ? err.message : String(err));
       }
     }
-  };
+  }, [logOut]);
 
   return { logout, loading, error } as const;
 }

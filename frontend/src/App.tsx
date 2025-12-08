@@ -4,19 +4,19 @@ import Hero from "./components/Hero";
 import LoginCard from "./components/LoginCard";
 import { ActivityListCard } from "./components/ActivityListCard";
 import { AIRecommendationCard } from "./components/AIRecommendationCard";
-import { useStravaActivities } from "./hooks/useStravaActivities";
 import Navbar from "./components/Navbar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { apiClient } from "./api/apiClient";
+import { useStravaActivities } from "./hooks/useStravaActivities";
 
 function App() {
-  const { activities, loading, error: apiError, refetch } = useStravaActivities("auth_token" in localStorage ? localStorage.getItem("auth_token") : null);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("auth_token"));
+  const { activities, loading, error: apiError, refetch } = useStravaActivities(token);
 
   useEffect(() => {
     const authenticateUser = () => {
-      const localToken = localStorage.getItem("auth_token");
-      if (localToken) {
-        apiClient.setToken(localToken);
+      if (token) {
+        apiClient.setToken(token);
         console.log("User authenticated with token from localStorage.");
         return;
       }
@@ -31,15 +31,15 @@ function App() {
 
       if (urlToken) {
         localStorage.setItem("auth_token", urlToken);
+        setToken(urlToken);
         apiClient.setToken(urlToken);
         console.log("User authenticated with token from URL.");
         window.history.replaceState(null, "", window.location.pathname);
-        return;
       }
     };
 
     authenticateUser();
-  }, []);
+  }, [token]);
 
   return (
     <main>
