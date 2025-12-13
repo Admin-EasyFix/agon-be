@@ -19,7 +19,6 @@ export const ActivityListCard: React.FC<ActivityListCardProps> = ({ activities }
         {activities.map((activity) => {
           const date = new Date(activity.date);
           const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-          const pace = activity.pace;
 
           return (
             <li key={activity.id}>
@@ -32,12 +31,14 @@ export const ActivityListCard: React.FC<ActivityListCardProps> = ({ activities }
                   <h3 className="activity-title">
                     {activity.name}
                   </h3>
-                  <div className="activity-pace">{pace}</div>
+                  <div className="activity-pace">{activity.pace}</div>
                 </div>
                 <div className="activity-details">
                   <span className="activity-date">{formattedDate}</span>
-                  <span className="activity-distance"> {((activity.distance ?? 0)/1000).toFixed(2)} km</span>
-                  <span className="activity-duration"> {((activity.duration ?? 0)/60).toFixed(2)} min</span>
+                  {activity.distance > 0 && (
+                    <span className="activity-distance"> {activity.distance} km</span>
+                  )}
+                  <span className="activity-duration"> {activity.duration} min</span>
                 </div>
                 <div className="activity-feedback">
                   {activity.description !== undefined && <span className="activity-comment">{activity.description}</span>}
