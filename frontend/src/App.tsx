@@ -10,21 +10,18 @@ import { apiClient } from "./api/apiClient";
 import { useStravaActivities } from "./hooks/useStravaActivities";
 
 function App() {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem("auth_token"));
+  const [token, setToken] = useState<string | null>(() => {
+    const localToken = localStorage.getItem("auth_token");
+    if (localToken) {
+      apiClient.setToken(localToken);
+      return localToken;
+    }
+    return null;
+  });
   const { activities, loading, error: apiError, refetch } = useStravaActivities(token);
 
   useEffect(() => {
     const authenticateUser = () => {
-      if (token) {
-        apiClient.setToken(token);
-        console.log("User authenticated with token from localStorage.");
-        return;
-      }
-      else {
-        apiClient.setToken(null);
-        console.log("User not authenticated.");
-      }
-
       const hash = window.location.hash;
       const params = new URLSearchParams(hash.replace(/^#\/?/, ""));
       const urlToken = params.get("token");
@@ -39,7 +36,7 @@ function App() {
     };
 
     authenticateUser();
-  }, [token]);
+  }, []);
 
   return (
     <main>
