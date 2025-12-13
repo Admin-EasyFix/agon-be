@@ -9,17 +9,12 @@ interface UseAthleteResult {
   refetch: () => void;
 }
 
-export function useAthlete(token: string | null): UseAthleteResult {
+export function useAthlete(): UseAthleteResult {
   const [athlete, setAthlete] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAthlete = useCallback(async () => {
-    if (!token) {
-      setAthlete(null);
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
@@ -32,7 +27,7 @@ export function useAthlete(token: string | null): UseAthleteResult {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchAthlete();
