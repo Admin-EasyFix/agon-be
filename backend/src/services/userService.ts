@@ -40,14 +40,6 @@ export class UserService {
     return user ? UserMapper.toStravaTokens(user) : null;
   }
 
-  async getStravaTokensByStravaId(stravaId: number): Promise<StravaTokens | null> {
-    const user = await this.userRepository.getByStravaId(stravaId);
-    if (!user) {
-      throw createError(NotFound, 'User not found');
-    }
-    return user ? UserMapper.toStravaTokens(user) : null;
-  }
-
   async deleteUserById(userId: number): Promise<void> {
     await this.userRepository.delete(userId);
   }

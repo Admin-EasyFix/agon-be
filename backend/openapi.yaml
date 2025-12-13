@@ -168,33 +168,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /api/strava/auth/deauthorize:
-    post:
-      summary: Logout
-      description: >
-        Deauthorizes the user from Strava and invalidates their access token. 
-        This endpoint removes the user's Strava tokens from the database and 
-        ensures the user is logged out of the application.
-      tags:
-        - Auth
-      security:
-        - BearerAuth: []
-      responses:
-        '204':
-          description: Successfully logged out and deauthorized from Strava.
-        '401':
-          description: Unauthorized. The Bearer token is missing, invalid, or expired.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError'
-        '500':
-          description: Internal Server Error. An unexpected error occurred on the server.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerError'
-
   /api/users/profile:
     get:
       summary: Get User Profile

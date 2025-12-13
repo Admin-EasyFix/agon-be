@@ -34,6 +34,7 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
         if (isAxiosError(err) && err.response?.status === 401) {
           setError('Your session has expired. Please log in again.');
           logout();
+          return; 
         } else {
           console.error('Error fetching activities:', err);
           setError('Failed to fetch activities. Please try again later.');
