@@ -10,8 +10,7 @@ interface AIRecommendationCardProps {
 
 export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({ activities }) => {
   const generateRecommendation = async (activities: Activity[]): Promise<Activity> => {
-    let suggested_activity: Activity;
-    suggested_activity = {
+    const suggested_activity: Activity = {
             id: -1,
             name: "Ready to Start Your Journey?",
             date: new Date().toISOString(),
@@ -31,10 +30,12 @@ export const AIRecommendationCard: React.FC<AIRecommendationCardProps> = ({ acti
       const response = await apiClient.getSuggestion();
       return response.data as Activity;
     } catch (error) {
-      console.error('Failed to generate suggestion:', error);
-      suggested_activity.name = "Keep Up The Momentum! 🚀";
-      suggested_activity.description =`${activities.length} activities logged! Your commitment to training is paying off. Keep building consistency and listen to your body for optimal results.`;
-      return suggested_activity;
+      console.error("Error fetching AI recommendation:", error);
+      return {
+        ...suggested_activity,
+        name: "Keep Up The Momentum! 🚀",
+        description: `${activities.length} activities logged! Your commitment to training is paying off. Keep building consistency and listen to your body for optimal results.`,
+      };
     }
   }
   
