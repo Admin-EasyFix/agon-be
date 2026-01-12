@@ -1,3 +1,4 @@
+// requered for the render
 require('dotenv').config();
 const { defineConfig } = require("prisma/config");
 
