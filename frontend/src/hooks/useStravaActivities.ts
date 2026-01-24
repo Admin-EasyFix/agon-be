@@ -28,8 +28,9 @@ export function useStravaActivities(token: string | null): UseStravaActivitiesRe
 
       try {
         const stravaActivities = await apiClient.getActivities().then(res => res.data);
-
-        setActivities(stravaActivities);
+        const runActivities = stravaActivities.filter((activity: Activity) => activity.type === 'running');
+        
+        setActivities(runActivities);
       } catch (err) {
         if (isAxiosError(err) && err.response?.status === 401) {
           setError('Your session has expired. Please log in again.');
