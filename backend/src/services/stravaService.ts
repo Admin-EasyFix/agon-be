@@ -24,7 +24,7 @@ export class StravaService {
     const oneMonthAgo = Math.floor(new Date().setMonth(new Date().getMonth() - 1) / 1000);
 
     const stravaActivities = await stravaClient.fetchActivities(30, 1, now, oneMonthAgo);
-    const runningActivities = stravaActivities.filter(activity => activity.type === 'Running');
+    const runningActivities = stravaActivities.filter(activity => activity.type === 'Run');
     return this.activityMapper.toActivities(runningActivities, { withAi: true });
   }
 }
