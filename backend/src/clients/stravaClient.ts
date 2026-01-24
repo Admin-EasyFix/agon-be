@@ -48,10 +48,25 @@ export class StravaClient {
 
   /**
    * Fetches a list of activities for the authenticated athlete from the Strava API.
-   * @param perPage The number of activities to fetch.
+   * @param perPage The number of activities to fetch per page. Defaults to 30.
+   * @param page The page number to fetch. Defaults to 1.
+   * @param before An epoch timestamp to filter activities before a certain time.
+   * @param after An epoch timestamp to filter activities after a certain time.
    * @returns A promise that resolves to an array of raw Strava activities.
    */
-  public async fetchActivities(perPage: number = 10): Promise<StravaActivity[]> {
-    return this._fetch<StravaActivity[]>(`/athlete/activities?per_page=${perPage}`);
+  public async fetchActivities(
+    perPage: number = 30,
+    page: number = 1,
+    before?: number,
+    after?: number
+  ): Promise<StravaActivity[]> {
+    const queryParams = new URLSearchParams({
+      per_page: perPage.toString(),
+      page: page.toString(),
+      ...(before ? { before: before.toString() } : {}),
+      ...(after ? { after: after.toString() } : {}),
+    });
+
+    return this._fetch<StravaActivity[]>(`/athlete/activities?${queryParams.toString()}`);
   }
 }

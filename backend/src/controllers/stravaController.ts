@@ -19,7 +19,7 @@ export class StravaController {
   async getActivities(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const token = await extractStravaAccessToken(req);
-      const activities = await this.stravaService.getActivities(token, 10);
+      const activities = await this.stravaService.getActivities(token);
   
       res.json(activities);
     } catch (error) {
@@ -34,7 +34,7 @@ export class StravaController {
   async getSuggestion(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const token = await extractStravaAccessToken(req);
-      const activities = await this.stravaService.getActivities(token, 10);
+      const activities = await this.stravaService.getActivities(token);
   
       const recommendation = await this.aiService.suggestNextActivity(activities);
   
