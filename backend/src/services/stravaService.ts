@@ -15,12 +15,16 @@ export class StravaService {
   /**
    * Fetches and transforms activities from the Strava API.
    * @param accessToken The user's Strava access token.
-   * @param perPage The number of activities to fetch.
    * @returns A promise that resolves to an array of transformed activities.
    */
-  async getActivities(accessToken: string, perPage: number = 10): Promise<Activity[]> {
+  async getActivities(accessToken: string): Promise<Activity[]> {
     const stravaClient = new StravaClient(accessToken);
-    const stravaActivities = await stravaClient.fetchActivities(perPage);
-    return this.activityMapper.toActivities(stravaActivities, { withAi: true });
+
+    const now = Math.floor(Date.now() / 1000);
+    const oneMonthAgo = Math.floor(new Date().setMonth(new Date().getMonth() - 1) / 1000);
+
+    const stravaActivities = await stravaClient.fetchActivities(30, 1, now, oneMonthAgo);
+    const runningActivities = stravaActivities.filter(activity => activity.type === 'Run');
+    return this.activityMapper.toActivities(runningActivities, { withAi: true });
   }
 }
