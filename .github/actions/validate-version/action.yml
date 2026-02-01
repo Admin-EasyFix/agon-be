@@ -8,9 +8,9 @@ runs:
     - name: Auto bump version
       uses: Admin-EasyFix/github-actions/actions/npm/bump-pr-version@main
       with:
-        working-directory: frontend
+        working-directory: backend
 
     - name: Ensure version is updated
       uses: Admin-EasyFix/github-actions/actions/npm/validate-pr-version@main
       with:
-        working-directory: frontend
+        working-directory: backend
