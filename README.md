@@ -29,7 +29,7 @@ This command will:
 3. Apply the database schema using Prisma.
 4. Start the backend server on `http://localhost:4000`
 
-### 3️⃣ FrontendEnvironment Variables
+### 3️⃣ Environment Variables
 Create .env inside /backend:
 ```
 STRAVA_CLIENT_ID=your_client_id
@@ -46,4 +46,4 @@ The backend includes both unit and integration tests.
 
 
 ## 📜 License
-Apache-2.0 License © 2025
+Apache-2.0 License © 2026
