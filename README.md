@@ -2,7 +2,6 @@
 AI-powered training insights for athletes. Connect your Strava account to get smart workout plans, performance analytics, and personalized recommendations.
 
 ## 🛠️ Tech Stack
-* Frontend: React (Vite), TypeScript
 * Backend: Node.js, Express
 * Database: PostgreSQL (Dockerized)
 * Auth: Strava OAuth 2.0 + JWT sessions
@@ -18,14 +17,7 @@ AI-powered training insights for athletes. Connect your Strava account to get sm
 git clone https://github.com/your-username/agon.git
 cd agon
 ```
-### 2️⃣ Frontend
-```
-cd frontend
-npm install
-npm run dev
-Runs at http://localhost:5173.
-```
-### 3️⃣ Backend
+### 2️⃣ Backend
 ```
 cd backend
 npm install
@@ -37,7 +29,7 @@ This command will:
 3. Apply the database schema using Prisma.
 4. Start the backend server on `http://localhost:4000`
 
-### 4️⃣ Environment Variables
+### 3️⃣ FrontendEnvironment Variables
 Create .env inside /backend:
 ```
 STRAVA_CLIENT_ID=your_client_id
