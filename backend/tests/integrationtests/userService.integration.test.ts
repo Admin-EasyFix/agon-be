@@ -1,7 +1,7 @@
 import { describe, it, expect, afterAll, afterEach } from 'vitest';
-import { UserService } from '../src/services/userService';
-import prisma from '../src/prisma/client';
-import { StravaAthlete } from '../src/types/strava/StravaAthlete';
+import { UserService } from '../../src/services/userService';
+import prisma from '../../src/prisma/client';
+import { StravaAthlete } from '../../src/types/strava/StravaAthlete';
 import jwt from 'jsonwebtoken';
 
 describe('UserService Integration Test', () => {
