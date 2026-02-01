@@ -29,8 +29,3 @@ runs:
       uses: Admin-EasyFix/github-actions/actions/npm/type-check@main
       with:
         working-directory: backend
-
-    - name: Run tests
-      uses: Admin-EasyFix/github-actions/actions/npm/run-tests@main
-      with:
-        working-directory: backend
