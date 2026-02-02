@@ -1,6 +1,9 @@
 {
   "name": "backend",
-  "version": "1.9.1",
+  "version": "1.10.0",
+  "description": "Backend service for the application",
+  "license": "MIT",
+  "private": true,
   "main": "src/app.ts",
   "scripts": {
     "dev": "ts-node src/app.ts",
