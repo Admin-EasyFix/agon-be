@@ -17,15 +17,9 @@ runs:
       
     - name: Install dependencies
       uses: Admin-EasyFix/github-actions/actions/npm/install@main
-      with:
-        working-directory: backend
 
     - name: Run ESLint
       uses: Admin-EasyFix/github-actions/actions/npm/lint@main
-      with:
-        working-directory: backend
       
     - name: Run type check
       uses: Admin-EasyFix/github-actions/actions/npm/type-check@main
-      with:
-        working-directory: backend
