@@ -1,11 +1,12 @@
 {
   "name": "backend",
-  "version": "1.10.2",
+  "version": "1.10.4",
   "description": "Backend service for the application",
   "license": "MIT",
   "private": true,
   "main": "src/app.ts",
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "ts-node src/app.ts",
     "build": "tsc",
     "start": "node dist/app.js",
