@@ -35,7 +35,8 @@ export function extractUserIdFromRequest(req: Request): number {
 
     return userId;
   } catch (error) {
-    throw error;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw createError(Unauthorized, errorMessage);
   }
 }
 
@@ -47,7 +48,7 @@ export async function extractStravaAccessToken(req: Request, userService: UserSe
     const userId = extractUserIdFromRequest(req);
     const stravaTokens = await userService.getStravaTokensById(userId);
     if (!stravaTokens) {
-      throw createError(NotFound, 'Strava tokens not found for the user');
+      throw createError(Unauthorized, 'Strava tokens not found for the user');
     }
 
     const validTokens = await authService.validateStravaTokens(stravaTokens);
@@ -58,6 +59,7 @@ export async function extractStravaAccessToken(req: Request, userService: UserSe
 
     return validTokens?.access_token ?? stravaTokens.access_token;
   } catch (error) {
-    throw error;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    throw createError(Unauthorized, errorMessage);
   }
 }
