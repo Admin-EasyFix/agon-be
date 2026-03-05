@@ -11,6 +11,19 @@ AI-powered training insights for athletes. This is the backend service for Agon,
 - **Containerized Environment:** Uses Docker and Docker Compose for a consistent and isolated development and testing environment.
 - **Automated CI:** Includes GitHub Actions for continuous integration to validate the application on every push and pull request.
 
+## Tech Stack
+
+- **Runtime & Framework:** Node.js with Express
+- **Language:** TypeScript
+- **Database:** PostgreSQL
+- **ORM:** Prisma
+- **Authentication:** OAuth 2.0 (Strava), JWT
+- **AI Integration:** Google Gemini API
+- **API Documentation:** OpenAPI 3.0 / Swagger
+- **Containerization:** Docker & Docker Compose
+- **Testing:** Vitest
+- **External APIs:** Strava API, Google Gemini API
+
 ## Architecture Overview
 
 The application follows a standard client-server architecture. The Node.js/Express server exposes a REST API that authenticates users via Strava's OAuth2 flow, stores user tokens and profile data in a PostgreSQL database, and interacts with two primary external services:
