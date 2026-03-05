@@ -1,0 +1,307 @@
+openapi: 3.0.3
+info:
+  title: Agon Backend API
+  description: API for the Agon fitness dashboard, providing access to Strava data, AI-powered suggestions, and analytics.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+
+tags:
+  - name: General
+    description: General utility endpoints.
+  - name: Auth
+    description: Authentication and authorization with Strava.
+  - name: Activities
+    description: Endpoints related to user activities and AI suggestions.
+  - name: User
+    description: User-related endpoints.
+
+paths:
+  /:
+    get:
+      summary: Health Check
+      description: Checks if the API is running and returns a welcome message.
+      tags:
+        - General
+      responses:
+        '200':
+          description: API is up and running.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Welcome to the API!"
+
+  /api/strava/activities:
+    get:
+      summary: Get User Activities
+      description: Fetches a list of the authenticated user's most recent activities from Strava.
+      tags:
+        - Activities
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of user activities.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
+        '401':
+          description: Unauthorized. The Bearer token is missing, invalid, or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal Server Error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /api/suggest:
+    get:
+      summary: Get Activity Suggestion
+      description: Generates an AI-powered suggestion for the user's next activity based on their recent training history.
+      tags:
+        - Activities
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A suggested activity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          description: Unauthorized. The Bearer token is missing, invalid, or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal Server Error. An unexpected error occurred on the server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /api/strava/auth/authorize:
+    get:
+      summary: Authenticate with Strava
+      description: Redirects the user to Strava's authorization page to grant permission to the application.
+      tags:
+        - Auth
+      parameters:
+        - name: redirect_uri
+          in: query
+          required: true
+          description: The URL to which the user will be redirected after completing the Strava authorization process.
+          schema:
+            type: string
+            format: uri
+            example: "http://your-client-app.com/dashboard"
+      responses:
+        '200':
+          description: Authorization URL to redirect the user to Strava's authorization page.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authorization_url:
+                    type: string
+                    description: The URL to redirect the user for Strava authorization.
+                    example: https://www.strava.com/oauth/authorize?client_id=YOUR_CLIENT
+                required:
+                  - authorization_url
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /api/strava/auth/callback:
+    get:
+      summary: Strava Authorization Callback
+      description: >
+        Handles the callback from Strava after the user has authorized the application. 
+        The authorization code is exchanged for an access token, and the user is redirected 
+        to the `redirect_uri` with the token appended as a URL fragment (e.g., `#token=jwt_token`).
+      tags:
+        - Auth
+      parameters:
+        - name: code
+          in: query
+          required: true
+          description: The authorization code returned by Strava.
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          description: The encoded state parameter containing the `redirect_uri` and a nonce for security.
+          schema:
+            type: string
+      responses:
+        '302':
+          description: >
+            Redirects the user to the `redirect_uri` with the token appended as a URL fragment.
+            For example: `http://your-client-app.com/dashboard#token=jwt_token`.
+        '400':
+          description: Bad Request. Missing or invalid `code` or `state`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /api/users/profile:
+    get:
+      summary: Get User Profile
+      description: Fetches the authenticated user's profile information using an access token.
+      tags:
+        - User
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: Unauthorized. The token is missing, invalid, or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT used to authenticate API requests."
+
+  schemas:
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the activity.
+        name:
+          type: string
+          description: The name of the activity.
+        date:
+          type: string
+          format: date-time
+          description: The start date and time of the activity in ISO 8601 format.
+        distance:
+          type: number
+          format: float
+          description: The distance of the activity in kilometers.
+        pace:
+          type: string
+          description: The average pace of the activity (e.g., 'min:ss/km').
+        duration:
+          type: number
+          description: The duration of the activity in minutes.
+        description:
+          type: string
+          description: An AI-generated or fallback comment about the activity.
+        elevation:
+          type: number
+          description: Total elevation gain in meters.
+        heartRate:
+          type: number
+          description: Average heart rate in beats per minute.
+        type:
+          $ref: '#/components/schemas/ActivityType'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The user's unique identifier in the database.
+        firstname:
+          type: string
+          description: The user's first name.
+        lastname:
+          type: string
+          description: The user's last name.
+        profilePicture:
+          type: string
+          format: uri
+          description: URL to the user's profile picture.
+
+    UnauthorizedError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code.
+          example: 401
+        message:
+          type: string
+          description: A human-readable error message.
+          example: "Unauthorized: Invalid or expired Strava token."
+
+    InternalServerError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code.
+          example: 500
+        message:
+          type: string
+          description: A human-readable error message.
+          example: "Internal Server Error: An unexpected error occurred."
+
+    BadRequestError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: The HTTP status code.
+          example: 400
+        message:
+          type: string
+          description: A human-readable error message.
+          example: "Bad Request: Missing or invalid parameters."
+
+    ActivityType:
+      type: string
+      enum:
+        - running
+        - cycling
+        - swimming
+        - hiking
+        - other
+      description: The type of the activity.
