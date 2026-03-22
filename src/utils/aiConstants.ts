@@ -30,24 +30,39 @@ export const FALLBACK_COMMENTS = [
 ];
 
 export const getSuggestionPrompt = (activities: Activity[], date: string) => `
-      As a world-class running and fitness coach, analyze the following recent activities of a user and suggest a new activity.
+      You are an experienced running coach.
 
-      User's recent activities (JSON format):
-      ${JSON.stringify(activities.slice(0, 10), null, 2)}
+    Analyze the user's recent activities and suggest their next workout.
 
-      Based on this data, generate a response in a valid JSON format with the following structure:
-      {
-        "id": 123,
-        "name": "A short, catchy name for the suggested activity (e.g., 'Tempo Run')",
-        "date": "${date}",
-        "distance": "A suggested distance in kilometers (number).",
-        "duration": "A suggested duration in minutes (number).",
-        "pace": "A suggested pace in 'minutes:seconds' per kilometer format (string).",
-        "description": "A 1-2 sentence personalized message explaining the purpose of this workout.",
-        "type": "The type of activity: 'running', 'cycling', 'swimming', 'hiking', or 'other'."
-      }
+    User's recent activities (JSON):
+    ${JSON.stringify(activities.slice(0, 10), null, 2)}
 
-      Do not include any text outside of the JSON object.
+    Instructions:
+    - Identify patterns in frequency, distance, and intensity.
+    - Follow progressive overload (increase difficulty gradually, max ~10%).
+    - If recent activity is inconsistent or intense, suggest an easier workout.
+    - If consistent, suggest a slight progression.
+    - Avoid unrealistic jumps in distance or pace.
+
+    Output MUST be valid JSON only (no extra text).
+
+    Return EXACTLY this structure:
+    {
+      "id": number,
+      "name": string,
+      "date": "${date}",
+      "distance_km": number,
+      "duration_min": number,
+      "pace_min_per_km": string,
+      "type": "running" | "cycling" | "swimming" | "hiking" | "other",
+      "description": string
+    }
+
+    Rules:
+    - distance_km and duration_min must be numbers (not strings)
+    - pace_min_per_km must be in "MM:SS" format
+    - description must be 1–3 sentences max
+    - no fields outside this schema
     `;
 
 export const getBatchCommentsPrompt = (activitiesForPrompt: Activity[]) => `
