@@ -30,53 +30,92 @@ export const FALLBACK_COMMENTS = [
 ];
 
 export const getSuggestionPrompt = (activities: Activity[], date: string) => `
-      You are an experienced running coach.
+  You are an experienced running coach.
 
-    Analyze the user's recent activities and suggest their next workout.
+  Analyze the user's recent activities and suggest their next workout.
 
-    User's recent activities (JSON):
-    ${JSON.stringify(activities.slice(0, 10), null, 2)}
+  User's recent activities (JSON):
+  ${JSON.stringify(activities.slice(0, 10), null, 2)}
 
-    Instructions:
-    - Identify patterns in frequency, distance, and intensity.
-    - Follow progressive overload (increase difficulty gradually, max ~10%).
-    - If recent activity is inconsistent or intense, suggest an easier workout.
-    - If consistent, suggest a slight progression.
-    - Avoid unrealistic jumps in distance or pace.
+  Instructions:
+  - Treat activities as a timeline (ordered by date).
+  - Identify patterns in frequency, distance, and intensity.
+  - Evaluate performance trends:
+    - improvement (e.g., faster pace, lower heart rate for similar effort)
+    - decline (e.g., slower pace, higher effort)
+    - consistency
 
-    Output MUST be valid JSON only (no extra text).
+  - When possible, compare similar activities (e.g., similar distance or type).
 
-    Return EXACTLY this structure:
-    {
-      "id": number,
-      "name": string,
-      "date": "${date}",
-      "distance_km": number,
-      "duration_min": number,
-      "pace_min_per_km": string,
-      "type": "running" | "cycling" | "swimming" | "hiking" | "other",
-      "description": string
-    }
+  Training logic:
+  - Follow progressive overload (increase difficulty gradually, max ~10%).
+  - If performance is improving → allow slight progression.
+  - If performance is declining or fatigue is detected → suggest an easier workout.
+  - If inconsistent → prioritize a safe, moderate effort.
+  - Avoid unrealistic jumps in distance or pace.
 
-    Rules:
-    - distance_km and duration_min must be numbers (not strings)
-    - pace_min_per_km must be in "MM:SS" format
-    - description must be 1–3 sentences max
-    - no fields outside this schema
-    `;
+  Output MUST be valid JSON only (no extra text).
+
+  Return EXACTLY this structure:
+  {
+    "id": number,
+    "name": string,
+    "date": "${date}",
+    "distance_km": number,
+    "duration_min": number,
+    "pace_min_per_km": string,
+    "type": "running" | "cycling" | "swimming" | "hiking" | "other",
+    "description": string
+  }
+
+  Rules:
+  - distance_km and duration_min must be numbers (not strings)
+  - pace_min_per_km must be in "MM:SS" format
+  - description must be 1 to 3 sentences and MUST explain the reasoning based on recent trends
+  - Use ONLY available data (do not assume missing metrics)
+  - no fields outside this schema
+
+  Fallback:
+  - If data is insufficient or inconsistent, suggest a safe easy run.
+`;
 
 export const getBatchCommentsPrompt = (activitiesForPrompt: Activity[]) => `
-      As an expert fitness analyst, review the following activities. For each one, provide a concise, one-sentence analytical comment highlighting a key performance metric (like pace, elevation, or heart rate consistency).
-      Avoid generic encouragement.
+  You are a fitness performance analyst.
 
-      Activities Data (JSON format):
-      ${JSON.stringify(activitiesForPrompt, null, 2)}
+  Analyze each activity in the context of the athlete's recent history and generate a short, precise, data-driven comment.
 
-      Generate a response in a valid JSON format where each key is an activity ID and the value is the comment string. Example:
-      {
-        "12345": "Great pace on your run!",
-        "67890": "Awesome elevation gain on that hike."
-      }
+  Activities (JSON):
+  ${JSON.stringify(activitiesForPrompt, null, 2)}
 
-      Do not include any text outside of the JSON object. The keys in the JSON object must be the IDs of the activities provided.
-    `;
+  Instructions:
+  - Consider ALL activities as a timeline (ordered by date).
+  - For each activity, compare it to previous ones to identify trends (improvement, decline, or consistency).
+  - Return EXACTLY one comment per activity.
+
+  Comment requirements:
+  - 1 to 3 sentences maximum.
+  - Be concise and specific (no fluff).
+  - Base insights ONLY on available data (pace, heart rate, elevation, distance, duration, etc.).
+  - Do NOT assume missing metrics.
+  - Highlight:
+    - performance trends (e.g., faster pace vs previous runs, improved endurance, increased effort)
+    - or regressions (e.g., slower pace, higher heart rate for similar effort)
+    - or consistency (stable performance)
+
+  - Avoid generic encouragement (e.g., "Great job", "Nice run").
+
+  Output format:
+  - Return valid JSON ONLY (no extra text).
+  - Keys MUST exactly match the activity IDs.
+  - Include ALL activity IDs, no more, no less.
+  - Values must be strings.
+
+  Example:
+  {
+    "12345": "Your pace improved compared to recent runs, indicating better speed endurance.",
+    "67890": "This run shows a slower pace and higher effort than previous ones, suggesting possible fatigue.",
+    "99999": "Performance remains consistent with recent activities, maintaining a steady pace and effort."
+  }
+
+  Now generate the result.
+`;
