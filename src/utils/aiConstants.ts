@@ -38,9 +38,11 @@ export const getSuggestionPrompt = (activities: Activity[], date: string) => `
   ${JSON.stringify(activities.slice(0, 10), null, 2)}
 
   Instructions:
-  - Treat activities as a timeline (ordered by date).
   - Identify patterns in frequency, distance, and intensity.
-  - Evaluate performance trends:
+  - Evaluate performance trends but do not reference specific past workouts.
+  - Consider signs of improvement, decline, or consistency.
+  - Assume that the days without logged activities are rest days.
+  - Suggest a workout that promotes progress while minimizing injury risk.:
     - improvement (e.g., faster pace, lower heart rate)
     - decline (e.g., slower pace, higher effort)
     - consistency
@@ -91,26 +93,20 @@ export const getSuggestionPrompt = (activities: Activity[], date: string) => `
 export const getBatchCommentsPrompt = (activitiesForPrompt: Activity[]) => `
   You are a fitness performance analyst.
 
-  Analyze each activity in the context of the athlete's recent history and generate a short, precise, data-driven comment.
+  Analyze each activity and generate a short, precise, data-driven comment without referencing specific past workouts or dates.
 
   Activities (JSON):
   ${JSON.stringify(activitiesForPrompt, null, 2)}
 
   Instructions:
-  - Consider ALL activities as a timeline (ordered by date).
-  - For each activity, compare it to previous ones to identify trends (improvement, decline, or consistency).
   - Return EXACTLY one comment per activity.
 
   Comment requirements:
   - 1 to 3 sentences maximum.
   - Be concise and specific (no fluff).
   - Base insights ONLY on available data (pace, heart rate, elevation, distance, duration, etc.).
-  - Do NOT assume missing metrics.
-  - Highlight:
-    - performance trends (e.g., faster pace vs previous runs, improved endurance, increased effort)
-    - or regressions (e.g., slower pace, higher heart rate for similar effort)
-    - or consistency (stable performance)
-
+  - Highlight performance trends in a **generic way** (e.g., "steady pace", "higher effort", "consistent performance") rather than comparing to a specific past activity.
+  - Do NOT mention dates, previous run names, or exact past metrics.
   - Avoid generic encouragement (e.g., "Great job", "Nice run").
 
   Output format:
@@ -121,9 +117,9 @@ export const getBatchCommentsPrompt = (activitiesForPrompt: Activity[]) => `
 
   Example:
   {
-    "12345": "Your pace improved compared to recent runs, indicating better speed endurance.",
-    "67890": "This run shows a slower pace and higher effort than previous ones, suggesting possible fatigue.",
-    "99999": "Performance remains consistent with recent activities, maintaining a steady pace and effort."
+    "12345": "Pace remained steady with moderate effort throughout the run.",
+    "67890": "Elevations increased during this workout, requiring slightly more effort.",
+    "99999": "Performance shows consistent speed and effort."
   }
 
   Now generate the result.
