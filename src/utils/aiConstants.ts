@@ -41,18 +41,30 @@ export const getSuggestionPrompt = (activities: Activity[], date: string) => `
   - Treat activities as a timeline (ordered by date).
   - Identify patterns in frequency, distance, and intensity.
   - Evaluate performance trends:
-    - improvement (e.g., faster pace, lower heart rate for similar effort)
+    - improvement (e.g., faster pace, lower heart rate)
     - decline (e.g., slower pace, higher effort)
     - consistency
 
-  - When possible, compare similar activities (e.g., similar distance or type).
+  - Detect fatigue signals, such as:
+    - decreasing performance over recent activities
+    - increasing heart rate for similar effort
+    - high frequency without recovery days
 
   Training logic:
-  - Follow progressive overload (increase difficulty gradually, max ~10%).
-  - If performance is improving → allow slight progression.
-  - If performance is declining or fatigue is detected → suggest an easier workout.
-  - If inconsistent → prioritize a safe, moderate effort.
-  - Avoid unrealistic jumps in distance or pace.
+  - Follow progressive overload (max ~10% increase).
+  - If improving → suggest slight progression.
+  - If declining or fatigued → suggest an easier workout OR a rest day.
+  - If highly fatigued → strongly prefer a rest day.
+  - If inconsistent → suggest a safe, easy workout.
+
+  Rest day rules:
+  - A rest day is valid and should be suggested when recovery is needed.
+  - If suggesting rest:
+    - type MUST be "rest"
+    - distance_km = 0
+    - duration_min = 0
+    - pace_min_per_km = null
+    - name = "Rest Day"
 
   Output MUST be valid JSON only (no extra text).
 
@@ -63,20 +75,17 @@ export const getSuggestionPrompt = (activities: Activity[], date: string) => `
     "date": "${date}",
     "distance_km": number,
     "duration_min": number,
-    "pace_min_per_km": string,
-    "type": "running" | "cycling" | "swimming" | "hiking" | "other",
+    "pace_min_per_km": string | null,
+    "type": "running" | "cycling" | "swimming" | "hiking" | "other" | "rest",
     "description": string
   }
 
   Rules:
-  - distance_km and duration_min must be numbers (not strings)
-  - pace_min_per_km must be in "MM:SS" format
-  - description must be 1 to 3 sentences and MUST explain the reasoning based on recent trends
-  - Use ONLY available data (do not assume missing metrics)
+  - distance_km and duration_min must be numbers
+  - pace_min_per_km must be "MM:SS" or null if rest
+  - description must be 1 to 3 sentences explaining the reasoning
+  - Use ONLY available data
   - no fields outside this schema
-
-  Fallback:
-  - If data is insufficient or inconsistent, suggest a safe easy run.
 `;
 
 export const getBatchCommentsPrompt = (activitiesForPrompt: Activity[]) => `
