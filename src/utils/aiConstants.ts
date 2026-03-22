@@ -61,9 +61,9 @@ export const getSuggestionPrompt = (activities: Activity[], date: string) => `
   - A rest day is valid and should be suggested when recovery is needed.
   - If suggesting rest:
     - type MUST be "rest"
-    - distance_km = 0
-    - duration_min = 0
-    - pace_min_per_km = null
+    - distance = 0
+    - duration = 0
+    - pace = null
     - name = "Rest Day"
 
   Output MUST be valid JSON only (no extra text).
@@ -73,16 +73,16 @@ export const getSuggestionPrompt = (activities: Activity[], date: string) => `
     "id": number,
     "name": string,
     "date": "${date}",
-    "distance_km": number,
-    "duration_min": number,
-    "pace_min_per_km": string | null,
+    "distance": number,
+    "duration": number,
+    "pace": string | null,
     "type": "running" | "cycling" | "swimming" | "hiking" | "other" | "rest",
     "description": string
   }
 
   Rules:
-  - distance_km and duration_min must be numbers
-  - pace_min_per_km must be "MM:SS" or null if rest
+  - distance and duration must be numbers
+  - pace must be "M:SS" or null if rest
   - description must be 1 to 3 sentences explaining the reasoning
   - Use ONLY available data
   - no fields outside this schema
